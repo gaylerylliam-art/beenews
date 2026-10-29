@@ -5,5 +5,5 @@
 // Leave both empty to run in demo mode: the bundled edition is shown and preferences stay on the device.
 window.BEENEWS_CONFIG = {
   supabaseUrl: "https://ievzgeyqwacqmdfifhde.supabase.co",
-  supabaseAnonKey: ""
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlldnpnZXlxd2FjcW1kZmlmaGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyNDcxMzAsImV4cCI6MjEwODgyMzEzMH0.bhV6G2qvUwhEg14UnPL-lzn4FwbIMCLc7shVVq-K-5M"
 };
