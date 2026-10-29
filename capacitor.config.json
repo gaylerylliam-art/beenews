@@ -1,0 +1,9 @@
+{
+  "appId": "ae.beenews.app",
+  "appName": "BeeNews",
+  "webDir": "www",
+  "backgroundColor": "#0f172a",
+  "android": { "allowMixedContent": false },
+  "ios": { "contentInset": "never", "scheme": "BeeNews" },
+  "server": { "androidScheme": "https" }
+}

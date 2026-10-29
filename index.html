@@ -9,6 +9,12 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="css/app.css">
 <meta name="description" content="BeeNews — Bee the First to Know. Verified headlines across AI, GCC, Health, Sports, Politics, Cars, UAE Events, Markets and Horoscope, in English, Arabic, French and German.">
+<meta property="og:site_name" content="BeeNews">
+<meta property="og:type" content="website">
+<meta property="og:title" content="BeeNews · Bee the First to Know">
+<meta property="og:description" content="Verified news for the UAE and the Gulf, with every story linked to its original source.">
+<meta property="og:image" content="/images/og-default.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>BeeNews</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -804,11 +810,13 @@ footer{border-top:0}
     <div><h4 data-i="ftSections"></h4><ul id="ftSecs"></ul></div>
     <div><h4>BeeNews</h4><ul>
       <li><a href="#verify" data-i="verifyTitle"></a></li>
-      <li><a href="#verify" data-i="correctionsTitle"></a></li>
+      <li><a href="/editorial.html" data-i="lgEditorial"></a></li>
+      <li><a href="/corrections.html" data-i="lgCorrections"></a></li>
       <li><button type="button" class="ftlink" data-go="UAE Events" data-i="evTitle"></button></li>
       <li><button type="button" class="ftlink" data-go="Markets" data-i="mkTitle"></button></li></ul></div>
     <div><h4 data-i="ftApp"></h4><p class="ft-note" data-i="ftAppNote"></p></div>
   </div>
+  <nav class="ft-legal" aria-label="Legal"><a href="/privacy.html" data-i="lgPrivacy"></a><a href="/terms.html" data-i="lgTerms"></a><a href="/contact.html" data-i="lgContact"></a><span data-i="lgLicence"></span></nav>
   <div class="ft-bottom"><span>© 2026 BeeNews UAE</span><span data-i="footer1"></span><span data-i="footer2"></span></div>
 </div></footer>
 
@@ -1415,6 +1423,11 @@ de:{
  imgSlot:"Foto wartet auf Lizenz"
 }
 };
+/* legal and newsroom links (footer) */
+Object.assign(T.en,{lgPrivacy:"Privacy policy",lgTerms:"Terms of use",lgEditorial:"Editorial policy",lgCorrections:"Corrections",lgContact:"Contact",lgLicence:"Media licence: application in progress"});
+Object.assign(T.ar,{lgPrivacy:"سياسة الخصوصية",lgTerms:"شروط الاستخدام",lgEditorial:"السياسة التحريرية",lgCorrections:"التصحيحات",lgContact:"اتصل بنا",lgLicence:"الترخيص الإعلامي: الطلب قيد الإجراء"});
+Object.assign(T.fr,{lgPrivacy:"Confidentialité",lgTerms:"Conditions d'utilisation",lgEditorial:"Politique éditoriale",lgCorrections:"Corrections",lgContact:"Contact",lgLicence:"Licence média : demande en cours"});
+Object.assign(T.de,{lgPrivacy:"Datenschutz",lgTerms:"Nutzungsbedingungen",lgEditorial:"Redaktionsrichtlinien",lgCorrections:"Korrekturen",lgContact:"Kontakt",lgLicence:"Medienlizenz: Antrag läuft"});
 const ENTRY = {
  ar:{"Details to be announced":"التفاصيل لاحقاً","Everyone":"للجميع","Free visitor registration":"تسجيل مجاني للزوار","Free":"مجاني","From Dh245":"من 245 درهماً","Mostly free":"مجاني في معظمه","Museum ticket":"تذكرة المتحف","Open to the public":"مفتوح للجمهور","Registration required":"يتطلب التسجيل","Ticketed":"بتذاكر","Ticketed; free for under-3s, over-65s and People of Determination":"بتذاكر؛ مجاني لمن دون 3 سنوات وفوق 65 عاماً ولأصحاب الهمم","Trade visitors":"للزوار المهنيين"},
  fr:{"Details to be announced":"Détails à venir","Everyone":"Tout le monde","Free visitor registration":"Inscription visiteur gratuite","Free":"Gratuit","From Dh245":"À partir de 245 AED","Mostly free":"Majoritairement gratuit","Museum ticket":"Billet du musée","Open to the public":"Ouvert au public","Registration required":"Inscription obligatoire","Ticketed":"Payant","Ticketed; free for under-3s, over-65s and People of Determination":"Payant ; gratuit pour les moins de 3 ans, les plus de 65 ans et les personnes en situation de handicap","Trade visitors":"Visiteurs professionnels"},
@@ -1741,13 +1754,20 @@ const ico = (name, extra) => `<i class="fa-solid ${name}${extra?" "+extra:""}" a
 const pubInitials = p => (p||"?").replace(/\(.*?\)/g,"").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 const actBtns = st => `<button type="button" class="act listen" data-listen="${esc(st.id)}" title="${esc(t("listen"))}" aria-label="${esc(t("listen"))}">${ico("fa-volume-high")}</button>
   <button type="button" class="act save${isSaved(st.id)?" on":""}" data-save="${esc(st.id)}" aria-pressed="${isSaved(st.id)}" title="${esc(t("saveStory"))}" aria-label="${esc(t("saveStory"))}"><i class="${isSaved(st.id)?"fa-solid":"fa-regular"} fa-bookmark" aria-hidden="true"></i></button>`;
+/* Section header art (images/cards). Sections with several designs rotate by story, so neighbouring cards differ. */
+const CARDART = {"AI":["ai1","ai4","ai3","chip","ai2"],"GCC":["uae","econ1","econ2"],"Sports & Events":["sports"],"Politics":["navy"],"Cars":["cars"]};
+function artFor(st){
+  const list = CARDART[st.sec]; if(!list || !list.length) return "";
+  let h = 0; for(const c of String(st.id)) h = (h*31 + c.charCodeAt(0)) >>> 0;
+  return "images/cards/" + list[h % list.length] + ".webp";
+}
 function card(st){
   return `<article class="card sc-${SECCLS[st.sec]}" data-id="${esc(st.id)}">
-    <div class="art" aria-hidden="true">${ico(SECICON[st.sec]||"fa-newspaper","art-i")}</div>
+    ${(()=>{ const a = artFor(st); return a ? `<div class="art has-img" aria-hidden="true" style="background-image:url('${a}')"></div>` : `<div class="art" aria-hidden="true">${ico(SECICON[st.sec]||"fa-newspaper","art-i")}</div>`; })()}
     <span class="badge">${ico(SECICON[st.sec]||"fa-newspaper")} ${esc(secName(st.sec))}</span>
     <div class="cbody">
       <div class="tline">${ico("fa-clock")} <span>${ago(st)}</span><span class="dot">·</span><span class="ctry">${esc(ctry(st.country))}</span></div>
-      <h3 class="sp-h">${esc(SH(st))}</h3>
+      <a class="hlink" href="/story/${encodeURIComponent(st.id)}"><h3 class="sp-h">${esc(SH(st))}</h3></a>
       <p class="sum">${esc(SS(st))}</p>
       <div class="top">${lab(st.lab)}${st.sens?`<span class="flag">${esc(t("signoff"))}</span>`:""}</div>
       ${st.also?`<div class="also">${esc(t("alsoBy"))} ${esc(st.also)}</div>`:""}
@@ -1770,7 +1790,7 @@ function render(){
         <div class="hero-art" aria-hidden="true">${ico(SECICON[leadSt.sec]||"fa-newspaper","hero-i")}</div>
         <div class="hero-body">
           <div class="hero-badges"><span class="topbadge">${ico("fa-star")} ${esc(t("topStory"))}</span><span class="kick">${esc(secName(leadSt.sec))} · ${esc(ctry(leadSt.country))}</span>${lab(leadSt.lab)}${leadSt.sens?`<span class="flag">${esc(t("signoff"))}</span>`:""}</div>
-          <h2 class="sp-lead">${esc(SH(leadSt))}</h2>
+          <a class="hlink" href="/story/${encodeURIComponent(leadSt.id)}"><h2 class="sp-lead">${esc(SH(leadSt))}</h2></a>
           <p class="sum">${esc(SS(leadSt))}</p>
           <div class="hero-foot">
             <div class="pubrow"><span class="pubav">${esc(pubInitials(leadSt.pub))}</span><span><b>${esc(leadSt.pub)}</b><small>${fmt(leadSt)} · ${ago(leadSt)}</small></span></div>
@@ -1786,7 +1806,7 @@ function render(){
       <aside class="side">
         <div class="trend"><div class="trend-h"><h3>${ico("fa-arrow-trend-up")} ${esc(t("trending"))}</h3><button type="button" class="linkbtn" data-playlist="list">${ico("fa-headphones")} ${esc(t("playAll"))}</button></div>
           <ol>${trend.map((r,k)=>`<li class="sc-${SECCLS[r.sec]}"><span class="num">${String(k+1).padStart(2,"0")}</span><div><span class="kick">${esc(secName(r.sec))}</span>
-            <a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(SH(r))}</a><small>${ago(r)} · ${esc(r.pub)}</small></div>
+            <a href="/story/${encodeURIComponent(r.id)}">${esc(SH(r))}</a><small>${ago(r)} · ${esc(r.pub)}</small></div>
             <button type="button" class="act listen sm" data-listen="${esc(r.id)}" aria-label="${esc(t("listen"))}">${ico("fa-volume-high")}</button></li>`).join("")}</ol></div>
         <div class="brief"><h3>${esc(t("briefTitle"))}</h3><p>${esc(t("briefText"))}</p>
           <div class="brief-acts"><button type="button" class="pill-dark" data-brief="${signedIn?"cust":"signup"}">${esc(signedIn?t("customise"):t("briefCta"))}</button>

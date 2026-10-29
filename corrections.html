@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Corrections · BeeNews</title>
+<meta name="description" content="Every correction BeeNews has made to a published story.">
+<meta name="theme-color" content="#0f172a">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="/css/app.css">
+<link rel="stylesheet" href="/css/modern.css">
+<link rel="stylesheet" href="/css/pages.css">
+<style>
+.corr-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.corr-list li{background:var(--surface);border:1px solid var(--rule);border-inline-start:4px solid var(--bee);border-radius:14px;padding:14px 16px}
+.corr-list time{font:700 12px var(--f-ui);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.corr-list a{display:block;margin:4px 0 6px;font:800 16px/1.4 var(--f-ui);color:var(--ink);text-decoration:none}
+.corr-list a:hover{color:var(--accent)}
+.corr-list p{margin:0}
+</style>
+</head>
+<body>
+<header id="pgHead"></header>
+<main class="pg-main doc">
+  <h1 data-t="coTitle">Corrections</h1>
+  <p class="updated" data-t="coIntro">When we get something wrong, we fix it and say so here and on the story itself.</p>
+  <p><a href="/contact.html?kind=factual" class="btn btn-ghost"><i class="fa-solid fa-flag" aria-hidden="true"></i><span data-t="coReport">Report an error</span></a>
+     <a href="/editorial.html" class="btn btn-ghost"><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i><span data-t="editorial">Editorial policy</span></a></p>
+  <div id="coBox" aria-live="polite"><p data-t="coLoading">Loading…</p></div>
+</main>
+<footer id="pgFoot"></footer>
+<script src="/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/js/page.js"></script>
+<script>
+(function(){
+const {$, esc} = BNP;
+BNP.addStrings({
+  en:{coTitle:"Corrections",coIntro:"When we get something wrong, we fix it and say so here and on the story itself.",coReport:"Report an error",coLoading:"Loading…",coNone:"No corrections have been published yet.",coFail:"Corrections could not be loaded right now. Please try again shortly."},
+  ar:{coTitle:"التصحيحات",coIntro:"عندما نخطئ نصحّح الخطأ ونعلن ذلك هنا وفي الخبر نفسه.",coReport:"الإبلاغ عن خطأ",coLoading:"جارٍ التحميل…",coNone:"لم تُنشر أي تصحيحات حتى الآن.",coFail:"تعذّر تحميل التصحيحات الآن. حاول بعد قليل."},
+  fr:{coTitle:"Corrections",coIntro:"Quand nous nous trompons, nous corrigeons et l'indiquons ici et dans l'article.",coReport:"Signaler une erreur",coLoading:"Chargement…",coNone:"Aucune correction publiée pour l'instant.",coFail:"Impossible de charger les corrections pour le moment."},
+  de:{coTitle:"Korrekturen",coIntro:"Wenn wir einen Fehler machen, korrigieren wir ihn und weisen hier und in der Meldung darauf hin.",coReport:"Fehler melden",coLoading:"Wird geladen…",coNone:"Bisher wurden keine Korrekturen veröffentlicht.",coFail:"Korrekturen konnten gerade nicht geladen werden."}
+});
+let rows = null, failed = false;
+function draw(){
+  const box = $("coBox");
+  if(failed){ box.innerHTML = `<p class="msg err">${esc(BNP.t("coFail"))}</p>`; return; }
+  if(!rows) return;
+  if(!rows.length){ box.innerHTML = `<p>${esc(BNP.t("coNone"))}</p>`; return; }
+  const loc = BNP.lang==="ar" ? "ar-AE" : BNP.lang;
+  box.innerHTML = `<ul class="corr-list">${rows.map(r=>{
+    const st = r.stories || {}; const tr = {headline: ((st.translations||{})[BNP.lang] || [])[0]};
+    const when = new Date(r.corrected_at).toLocaleString(loc,{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Dubai"});
+    return `<li><time datetime="${esc(r.corrected_at)}">${esc(when)}</time><a href="/story/${encodeURIComponent(r.story_id)}">${esc(tr.headline || st.headline || r.story_id)}</a><p>${esc(r.note)}</p></li>`;
+  }).join("")}</ul>`;
+}
+BNP.onLang = draw;
+BNP.render();
+(async()=>{
+  if(!BNP.sb){ failed = true; return draw(); }
+  const {data, error} = await BNP.sb.from("story_corrections")
+    .select("id,story_id,note,corrected_at,stories(headline,translations)")
+    .order("corrected_at",{ascending:false}).limit(200);
+  if(error){ console.warn("BeeNews: corrections", error); failed = true; } else rows = data;
+  draw();
+})();
+})();
+</script>
+</body>
+</html>

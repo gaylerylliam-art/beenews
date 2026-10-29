@@ -5,8 +5,10 @@
 "use strict";
 const CFG = window.BEENEWS_CONFIG || {};
 const sb = (CFG.supabaseUrl && CFG.supabaseAnonKey && window.supabase && window.supabase.createClient)
-  ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, {auth:{persistSession:true, detectSessionInUrl:true}})
+  ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, {auth:{persistSession:true, detectSessionInUrl:!window.BN_NATIVE, flowType:window.BN_NATIVE?"pkce":"implicit"}})
   : null;
+// Where email links and sign-in return to: this page on the web, the public site inside the app.
+const siteBase = () => (window.BN_NATIVE && CFG.siteUrl) ? CFG.siteUrl.replace(/\/$/,"") + "/" : location.origin + location.pathname;
 const STORY_SECTIONS = ["AI","GCC","Health & Wellness","Sports & Events","Politics","Cars"];
 const COUNTRIES = ["UAE","Saudi Arabia","Qatar","Kuwait","Bahrain","Oman","Morocco","Philippines","International"];
 const DEFAULTS = {language:null, sections:[], countries:[], horoscope_sign:null, currencies:["INR","EUR","GBP"]};
@@ -79,7 +81,33 @@ const BT = {
   mDeleteYes:"Ja, Konto löschen",mDeleted:"Ihr Konto wurde gelöscht.",close:"Schließen",
   errGeneric:"Etwas ist schiefgelaufen. Bitte erneut versuchen.",errOffline:"BeeNews ist nicht erreichbar. Die gespeicherte Ausgabe wird angezeigt."}
 };
-for (const l of Object.keys(BT)) Object.assign(T[l], BT[l]);
+const BT2 = {
+ en:{askH:"Ask BeeNews",askPh:"e.g. Show me more AI and Saudi news, and read me today's health stories",askGo:"Ask",askBusy:"Thinking…",askApplied:"Suggested settings are ticked below. Check them, then press Save.",askPlay:"Play these stories",askSignIn:"Sign in to use Ask BeeNews.",askOff:"Ask BeeNews isn't switched on yet.",askNote:"Ask BeeNews uses AI. It only changes your settings when you press Save.",
+  alertsH:"Breaking-news alerts",alertsOn:"Turn on alerts",alertsOff:"Turn off alerts",alertsOnMsg:"Alerts are on for this device.",alertsOffMsg:"Alerts are off for this device.",alertsDenied:"Notifications are blocked in your browser settings.",alertsNo:"This browser doesn't support alerts.",alertsNote:"Only for major breaking stories in your chosen sections.",captchaErr:"Please complete the security check.",
+  aApple:"Continue with Apple",aAgree:"I agree to the {terms} and the {privacy}.",aMarketing:"Email me the BeeNews daily briefing (optional).",aTerms:"Terms of use",aPrivacy:"Privacy policy",
+  aLegalNote:"By continuing you agree to the {terms} and the {privacy}.",aMustAgree:"Please accept the Terms of use and Privacy policy to continue.",
+  cnTitle:"One more step",cnBody:"Please accept our updated terms to keep using your BeeNews account.",cnAccept:"Accept and continue",cnLater:"Sign out"},
+ ar:{askH:"اسأل بي نيوز",askPh:"مثال: أريد المزيد من أخبار الذكاء الاصطناعي والسعودية، واقرأ لي أخبار الصحة اليوم",askGo:"اسأل",askBusy:"جارٍ التفكير…",askApplied:"تم تحديد الإعدادات المقترحة أدناه. راجعها ثم اضغط حفظ.",askPlay:"تشغيل هذه الأخبار",askSignIn:"سجّل الدخول لاستخدام اسأل بي نيوز.",askOff:"خدمة اسأل بي نيوز غير مفعّلة بعد.",askNote:"تستخدم خدمة اسأل بي نيوز الذكاء الاصطناعي، ولا تغيّر إعداداتك إلا عند الضغط على حفظ.",
+  alertsH:"تنبيهات الأخبار العاجلة",alertsOn:"تفعيل التنبيهات",alertsOff:"إيقاف التنبيهات",alertsOnMsg:"التنبيهات مفعّلة على هذا الجهاز.",alertsOffMsg:"التنبيهات متوقفة على هذا الجهاز.",alertsDenied:"الإشعارات محظورة في إعدادات المتصفح.",alertsNo:"هذا المتصفح لا يدعم التنبيهات.",alertsNote:"فقط للأخبار العاجلة المهمة في أقسامك المختارة.",captchaErr:"يرجى إكمال التحقق الأمني.",
+  aApple:"المتابعة باستخدام Apple",aAgree:"أوافق على {terms} و{privacy}.",aMarketing:"أرسلوا لي موجز بي نيوز اليومي بالبريد (اختياري).",aTerms:"شروط الاستخدام",aPrivacy:"سياسة الخصوصية",
+  aLegalNote:"بالمتابعة فإنك توافق على {terms} و{privacy}.",aMustAgree:"يرجى قبول شروط الاستخدام وسياسة الخصوصية للمتابعة.",
+  cnTitle:"خطوة أخيرة",cnBody:"يرجى قبول شروطنا المحدّثة لمواصلة استخدام حسابك في بي نيوز.",cnAccept:"موافقة ومتابعة",cnLater:"تسجيل الخروج"},
+ fr:{askH:"Demander à BeeNews",askPh:"ex. Plus d'IA et d'Arabie saoudite, et lisez-moi les actus santé du jour",askGo:"Demander",askBusy:"Réflexion…",askApplied:"Les réglages suggérés sont cochés ci-dessous. Vérifiez puis enregistrez.",askPlay:"Écouter ces articles",askSignIn:"Connectez-vous pour utiliser l'assistant.",askOff:"L'assistant n'est pas encore activé.",askNote:"L'assistant utilise l'IA. Rien ne change avant d'enregistrer.",
+  alertsH:"Alertes infos urgentes",alertsOn:"Activer les alertes",alertsOff:"Désactiver les alertes",alertsOnMsg:"Alertes activées sur cet appareil.",alertsOffMsg:"Alertes désactivées sur cet appareil.",alertsDenied:"Les notifications sont bloquées dans votre navigateur.",alertsNo:"Ce navigateur ne prend pas en charge les alertes.",alertsNote:"Uniquement pour les infos majeures de vos rubriques.",captchaErr:"Veuillez compléter la vérification de sécurité.",
+  aApple:"Continuer avec Apple",aAgree:"J'accepte les {terms} et la {privacy}.",aMarketing:"Recevoir le briefing quotidien BeeNews par e-mail (facultatif).",aTerms:"Conditions d'utilisation",aPrivacy:"Politique de confidentialité",
+  aLegalNote:"En continuant, vous acceptez les {terms} et la {privacy}.",aMustAgree:"Veuillez accepter les conditions et la politique de confidentialité.",
+  cnTitle:"Encore une étape",cnBody:"Veuillez accepter nos conditions mises à jour pour continuer à utiliser votre compte.",cnAccept:"Accepter et continuer",cnLater:"Se déconnecter"},
+ de:{askH:"BeeNews fragen",askPh:"z. B. Mehr KI und Saudi-Arabien, und lies mir die heutigen Gesundheitsmeldungen vor",askGo:"Fragen",askBusy:"Denkt nach…",askApplied:"Vorgeschlagene Einstellungen sind unten markiert. Prüfen und speichern.",askPlay:"Diese Meldungen abspielen",askSignIn:"Melden Sie sich an, um den Assistenten zu nutzen.",askOff:"Der Assistent ist noch nicht aktiviert.",askNote:"Der Assistent nutzt KI. Nichts ändert sich, bevor Sie speichern.",
+  alertsH:"Eilmeldungen",alertsOn:"Benachrichtigungen an",alertsOff:"Benachrichtigungen aus",alertsOnMsg:"Benachrichtigungen auf diesem Gerät an.",alertsOffMsg:"Benachrichtigungen auf diesem Gerät aus.",alertsDenied:"Benachrichtigungen sind im Browser blockiert.",alertsNo:"Dieser Browser unterstützt keine Benachrichtigungen.",alertsNote:"Nur für wichtige Eilmeldungen in Ihren Rubriken.",captchaErr:"Bitte schließen Sie die Sicherheitsprüfung ab.",
+  aApple:"Weiter mit Apple",aAgree:"Ich stimme den {terms} und der {privacy} zu.",aMarketing:"BeeNews-Tagesbriefing per E-Mail erhalten (optional).",aTerms:"Nutzungsbedingungen",aPrivacy:"Datenschutzerklärung",
+  aLegalNote:"Mit dem Fortfahren stimmen Sie den {terms} und der {privacy} zu.",aMustAgree:"Bitte akzeptieren Sie Nutzungsbedingungen und Datenschutzerklärung.",
+  cnTitle:"Noch ein Schritt",cnBody:"Bitte akzeptieren Sie unsere aktualisierten Bedingungen, um Ihr Konto weiter zu nutzen.",cnAccept:"Akzeptieren und weiter",cnLater:"Abmelden"}
+};
+for (const l of Object.keys(BT)) Object.assign(T[l], BT[l], BT2[l]);
+const TERMS_VERSION = "2026-10-29";
+const legalLinks = key => esc(t(key)).replace("{terms}", `<a href="/terms.html" target="_blank" rel="noopener">${esc(t("aTerms"))}</a>`)
+                                      .replace("{privacy}", `<a href="/privacy.html" target="_blank" rel="noopener">${esc(t("aPrivacy"))}</a>`);
+let needsConsent = false;
 
 /* ---------- small helpers ---------- */
 const h = (tag, attrs={}, html="") => { const e=document.createElement(tag); for(const [k,v] of Object.entries(attrs)) e.setAttribute(k,v); e.innerHTML=html; return e; };
@@ -109,7 +137,7 @@ function toast(title, sub, action){
 }
 const withTimeout = (pr, ms) => Promise.race([pr, new Promise((_,rej)=>setTimeout(()=>rej(new Error(t("errSlow"))), ms))]);
 document.body.appendChild(dlg);
-dlg.addEventListener("click", e=>{ if(e.target===dlg) dlg.close(); });
+dlg.addEventListener("click", e=>{ if(e.target===dlg && !needsConsent) dlg.close(); });
 
 function openDialog(render){ render(); if(!dlg.open) dlg.showModal(); const f=dlg.querySelector("input,select,button.primary"); if(f) f.focus(); }
 function msg(text, kind){ const m=dlg.querySelector(".dmsg"); if(m){ m.textContent=text; m.dataset.kind=kind||"info"; m.hidden=!text; } }
@@ -127,39 +155,89 @@ function authView(view){
   const email = `<label>${esc(t("aEmail"))}<input type="email" name="email" autocomplete="email" required></label>`;
   const pw = (ac)=>`<label>${esc(t("aPassword"))}<input type="password" name="password" autocomplete="${ac}" minlength="8" required><small>${esc(t("aPwRule"))}</small></label>`;
   let body = "";
+  const oauth = `<button type="button" class="google" id="dGoogle"><i class="fa-brands fa-google" aria-hidden="true"></i> ${esc(t("aGoogle"))}</button>`+
+    (CFG.appleSignIn ? `<button type="button" class="apple" id="dApple"><i class="fa-brands fa-apple" aria-hidden="true"></i> ${esc(t("aApple"))}</button>` : "")+
+    `<p class="dlegal">${legalLinks("aLegalNote")}</p>`;
   if(view==="signin") body = email+pw("current-password")+`<button class="primary" type="submit">${esc(t("signIn"))}</button>
-      <button type="button" class="google" id="dGoogle">${esc(t("aGoogle"))}</button>
+      ${oauth}
       <div class="dlinks"><button type="button" class="link" data-v="reset">${esc(t("aForgot"))}</button><button type="button" class="link" data-v="signup">${esc(t("aNoAcct"))}</button></div>`;
   if(view==="signup") body = `<label>${esc(t("aName"))}<input name="name" autocomplete="name" maxlength="80"></label>`+email+pw("new-password")+
-      `<button class="primary" type="submit">${esc(t("aCreate"))}</button><button type="button" class="google" id="dGoogle">${esc(t("aGoogle"))}</button>
+      `<label class="consent"><input type="checkbox" name="agree" value="1" required><span>${legalLinks("aAgree")}</span></label>
+      <label class="consent"><input type="checkbox" name="marketing" value="1"><span>${esc(t("aMarketing"))}</span></label>
+      <button class="primary" type="submit">${esc(t("aCreate"))}</button>${oauth}
       <div class="dlinks"><button type="button" class="link" data-v="signin">${esc(t("aHaveAcct"))}</button></div>`;
   if(view==="reset") body = email+`<button class="primary" type="submit">${esc(t("aSendLink"))}</button>
       <div class="dlinks"><button type="button" class="link" data-v="signin">${esc(t("aBack"))}</button></div>`;
   if(view==="newpass") body = pw("new-password")+`<button class="primary" type="submit">${esc(t("aUpdate"))}</button>`;
+  if(CFG.turnstileSiteKey && view!=="newpass") body = body.replace(/(<button class="primary" type="submit">)/, `<div class="captcha" id="dCaptcha"></div>$1`);
   dlg.innerHTML = `<form class="dbody" novalidate><div class="dhead"><h2>${esc(t(head))}</h2><button type="button" class="x" aria-label="${esc(t("close"))}">×</button></div>
     <p class="dmsg" hidden role="status"></p>${body}</form>`;
+  mountCaptcha();
   const form = dlg.querySelector("form");
   dlg.querySelector(".x").onclick = ()=>dlg.close();
   dlg.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>openDialog(()=>authView(b.dataset.v)));
   const g = dlg.querySelector("#dGoogle");
-  if(g) g.onclick = async ()=>{ const {error} = await sb.auth.signInWithOAuth({provider:"google", options:{redirectTo:location.origin+location.pathname}}); if(error) msg(friendlyError(error),"error"); };
+  const oauthGo = provider => async ()=>{
+    const native = window.BN_NATIVE;
+    const {data, error} = await sb.auth.signInWithOAuth({provider, options:{redirectTo: native ? native.redirect : location.origin+location.pathname, skipBrowserRedirect: !!native}});
+    if(error) return msg(friendlyError(error),"error");
+    if(native && data && data.url) native.openAuth(data.url);
+  };
+  if(g) g.onclick = oauthGo("google");
+  const ap = dlg.querySelector("#dApple"); if(ap) ap.onclick = oauthGo("apple");
   form.onsubmit = async (e)=>{
     e.preventDefault();
+    if(view==="signup" && !form.agree.checked){ msg(t("aMustAgree"),"error"); form.agree.focus(); return; }
     if(!form.checkValidity()){ form.reportValidity(); return; }
-    const f = Object.fromEntries(new FormData(form)); busy(form,true); msg("");
+    const f = Object.fromEntries(new FormData(form));
+    const captchaToken = CFG.turnstileSiteKey && view!=="newpass" ? (f["cf-turnstile-response"] || "") : undefined;
+    if(CFG.turnstileSiteKey && view!=="newpass" && !captchaToken){ msg(t("captchaErr"),"error"); return; }
+    busy(form,true); msg("");
     try{
-      if(view==="signin"){ const {error} = await sb.auth.signInWithPassword({email:f.email, password:f.password}); if(error) throw error; dlg.close(); }
+      if(view==="signin"){ const {error} = await sb.auth.signInWithPassword({email:f.email, password:f.password, options:{captchaToken}}); if(error) throw error; dlg.close(); }
       if(view==="signup"){
-        const {data,error} = await sb.auth.signUp({email:f.email, password:f.password, options:{emailRedirectTo:location.origin+location.pathname, data:{display_name:f.name||"", language:lang}}});
+        const {data,error} = await sb.auth.signUp({email:f.email, password:f.password, options:{captchaToken, emailRedirectTo:siteBase(), data:{display_name:f.name||"", language:lang, terms_version:TERMS_VERSION, marketing_opt_in:!!f.marketing}}});
+        track("signup");
         if(error) throw error;
         if(data.session){ dlg.close(); } else { msg(t("aCheckEmail"),"ok"); }
       }
-      if(view==="reset"){ const {error} = await sb.auth.resetPasswordForEmail(f.email,{redirectTo:location.origin+location.pathname}); if(error) throw error; msg(t("aResetSent"),"ok"); }
+      if(view==="reset"){ const {error} = await sb.auth.resetPasswordForEmail(f.email,{captchaToken, redirectTo:siteBase()}); if(error) throw error; msg(t("aResetSent"),"ok"); }
       if(view==="newpass"){ const {error} = await sb.auth.updateUser({password:f.password}); if(error) throw error; msg(t("aPwUpdated"),"ok"); setTimeout(()=>dlg.close(),1200); }
-    }catch(err){ msg(friendlyError(err),"error"); }
+    }catch(err){ msg(friendlyError(err),"error"); if(window.turnstile) try{ turnstile.reset(); }catch(e){} }
     finally{ busy(form,false); }
   };
 }
+/* Cloudflare Turnstile captcha (only when config.js has turnstileSiteKey; also enable it in Supabase → Auth → Bot protection) */
+let tsLoading = null;
+function mountCaptcha(){
+  const el = dlg.querySelector("#dCaptcha"); if(!el) return;
+  const render = ()=>{ try{ turnstile.render(el, {sitekey:CFG.turnstileSiteKey, language:lang==="ar"?"ar":lang, theme:document.documentElement.dataset.theme==="dark"?"dark":"auto"}); }catch(e){ console.warn("BeeNews: captcha", e); } };
+  if(window.turnstile) return render();
+  if(!tsLoading) tsLoading = new Promise((ok, bad)=>{ const s = document.createElement("script"); s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"; s.async = true; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+  tsLoading.then(render, ()=>console.warn("BeeNews: captcha script blocked"));
+}
+
+/* ----- consent prompt (Google/Apple sign-ins, or after the terms change) ----- */
+function consentView(){
+  dlg.innerHTML = `<form class="dbody" novalidate><div class="dhead"><h2>${esc(t("cnTitle"))}</h2></div>
+    <p class="dmsg" hidden role="status"></p><p class="dnote">${esc(t("cnBody"))}</p>
+    <label class="consent"><input type="checkbox" name="agree" value="1" required><span>${legalLinks("aAgree")}</span></label>
+    <label class="consent"><input type="checkbox" name="marketing" value="1"><span>${esc(t("aMarketing"))}</span></label>
+    <div class="dactions"><button class="primary" type="submit">${esc(t("cnAccept"))}</button><button type="button" id="dOut">${esc(t("cnLater"))}</button></div></form>`;
+  const form = dlg.querySelector("form");
+  dlg.querySelector("#dOut").onclick = async ()=>{ needsConsent = false; await sb.auth.signOut(); dlg.close(); };
+  form.onsubmit = async e=>{
+    e.preventDefault();
+    if(!form.agree.checked){ msg(t("aMustAgree"),"error"); return; }
+    busy(form,true);
+    const {error} = await sb.rpc("accept_terms",{version:TERMS_VERSION, marketing:form.marketing.checked});
+    busy(form,false);
+    if(error){ msg(friendlyError(error),"error"); return; }
+    needsConsent = false; dlg.close();
+  };
+}
+dlg.addEventListener("cancel", e=>{ if(needsConsent) e.preventDefault(); });
+function promptConsentIfNeeded(){ if(needsConsent && session) openDialog(consentView); }
 
 /* ----- account dialog ----- */
 function accountView(){
@@ -168,11 +246,13 @@ function accountView(){
     <p class="dmsg" hidden role="status"></p>
     <p class="dnote">${esc(t("mSignedInAs"))} <b>${esc(profileName||email)}</b><br><span class="mono">${esc(email)}</span></p>
     <div class="dactions"><button class="primary" type="button" id="dCust">${esc(t("customise"))}</button><button type="button" id="dOut">${esc(t("mSignOut"))}</button></div>
+    ${CFG.vapidPublicKey ? `<div class="alerts"><h3>${esc(t("alertsH"))}</h3><p class="dnote">${esc(t("alertsNote"))}</p><button type="button" id="dAlerts" class="cta-ghost sm"></button></div>` : ""}
     <div class="danger"><button type="button" class="link dangerlink" id="dDel">${esc(t("mDelete"))}</button>
       <div id="dDelConfirm" hidden><p>${esc(t("mDeleteQ"))}</p><button type="button" class="dangerbtn" id="dDelYes">${esc(t("mDeleteYes"))}</button> <button type="button" id="dDelNo">${esc(t("cCancel"))}</button></div></div></div>`;
   dlg.querySelector(".x").onclick = ()=>dlg.close();
   dlg.querySelector("#dCust").onclick = ()=>openDialog(customiseView);
   dlg.querySelector("#dOut").onclick = async ()=>{ await sb.auth.signOut(); dlg.close(); };
+  if(dlg.querySelector("#dAlerts")) setupAlerts(dlg.querySelector("#dAlerts"));
   dlg.querySelector("#dDel").onclick = ()=>{ dlg.querySelector("#dDelConfirm").hidden=false; };
   dlg.querySelector("#dDelNo").onclick = ()=>{ dlg.querySelector("#dDelConfirm").hidden=true; };
   dlg.querySelector("#dDelYes").onclick = async ()=>{
@@ -180,6 +260,35 @@ function accountView(){
     if(error){ msg(friendlyError(error),"error"); return; }
     await sb.auth.signOut(); prefs = Object.assign({},DEFAULTS); saveLocal(prefs); applyPrefs();
     msg(t("mDeleted"),"ok"); setTimeout(()=>dlg.close(),1500);
+  };
+}
+
+/* ----- breaking-news alerts (web push) ----- */
+const b64 = s => { const p = "=".repeat((4 - s.length % 4) % 4); const raw = atob((s + p).replace(/-/g,"+").replace(/_/g,"/")); return Uint8Array.from(raw, c=>c.charCodeAt(0)); };
+async function setupAlerts(btn){
+  const ok = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+  if(!ok){ btn.textContent = t("alertsNo"); btn.disabled = true; return; }
+  const reg = await navigator.serviceWorker.getRegistration() || await navigator.serviceWorker.register("sw.js");
+  let sub = await reg.pushManager.getSubscription();
+  const label = ()=>{ btn.innerHTML = `<i class="fa-solid ${sub?"fa-bell-slash":"fa-bell"}" aria-hidden="true"></i> ${esc(t(sub?"alertsOff":"alertsOn"))}`; };
+  label();
+  btn.onclick = async ()=>{
+    btn.disabled = true;
+    try{
+      if(sub){
+        await sb.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
+        await sub.unsubscribe(); sub = null; msg(t("alertsOffMsg"),"ok");
+      } else {
+        if(await Notification.requestPermission() !== "granted"){ msg(t("alertsDenied"),"error"); return; }
+        sub = await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64(CFG.vapidPublicKey)});
+        const j = sub.toJSON();
+        const {error} = await sb.from("push_subscriptions").upsert({endpoint:j.endpoint, p256dh:j.keys.p256dh, auth:j.keys.auth,
+          user_id:session.user.id, sections:prefs.sections, lang});
+        if(error) throw error;
+        msg(t("alertsOnMsg"),"ok"); track("install","push");
+      }
+    }catch(e){ msg(friendlyError(e),"error"); }
+    finally{ btn.disabled = false; label(); }
   };
 }
 
@@ -193,6 +302,9 @@ function customiseView(){
   const signs = `<option value="">${esc(t("cNoSign"))}</option>`+SIGNS.map(([k])=>`<option value="${k}"${prefs.horoscope_sign===k?" selected":""}>${esc(t(k))}</option>`).join("");
   dlg.innerHTML = `<form class="dbody wide"><div class="dhead"><h2>${esc(t("cTitle"))}</h2><button type="button" class="x" aria-label="${esc(t("close"))}">×</button></div>
     <p class="dmsg" hidden role="status"></p>
+    ${sb ? `<div class="askbox"><label for="askIn"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> ${esc(t("askH"))}</label>
+      <div class="askrow"><input id="askIn" maxlength="500" placeholder="${esc(t("askPh"))}"><button type="button" class="cta-amber sm" id="askGo">${esc(t("askGo"))}</button></div>
+      <p class="asknote">${esc(t("askNote"))}</p><div id="askOut" role="status" aria-live="polite"></div></div>` : ""}
     <fieldset><legend>${esc(t("cSections"))}</legend><div class="opts">${sec}</div></fieldset>
     <fieldset><legend>${esc(t("cCountries"))}</legend><div class="opts">${ctr}</div></fieldset>
     <div class="row2"><label>${esc(t("cLang"))}<select name="language">${langs}</select></label>
@@ -201,6 +313,32 @@ function customiseView(){
     <div class="dactions"><button class="primary" type="submit">${esc(t("cSave"))}</button><button type="button" id="dCancel">${esc(t("cCancel"))}</button></div></form>`;
   const form = dlg.querySelector("form");
   dlg.querySelector(".x").onclick = dlg.querySelector("#dCancel").onclick = ()=>dlg.close();
+  const askGo = dlg.querySelector("#askGo");
+  if(askGo){
+    const askIn = dlg.querySelector("#askIn"), out = dlg.querySelector("#askOut");
+    askIn.onkeydown = e=>{ if(e.key==="Enter"){ e.preventDefault(); askGo.click(); } };
+    askGo.onclick = async ()=>{
+      const q = askIn.value.trim(); if(!q) return;
+      if(!session){ out.innerHTML = `<p>${esc(t("askSignIn"))}</p>`; return; }
+      askGo.disabled = true; askGo.textContent = t("askBusy"); out.innerHTML = "";
+      try{
+        const {data, error} = await sb.functions.invoke("ask", {body:{message:q, lang, currencyCodes:FXR.map(f=>f.c)}});
+        if(error){ let m = t("askOff"); try{ const b = await error.context.json(); if(b && b.error) m = b.error; }catch(_){} throw new Error(m); }
+        let html = `<p>${esc(data.reply||"")}</p>`;
+        if(data.prefs){
+          const set = (name, vals)=>{ if(!Array.isArray(vals)) return; form.querySelectorAll(`input[name="${name}"]`).forEach(i=>{ i.checked = vals.includes(i.value); }); };
+          set("sections", data.prefs.sections); set("countries", data.prefs.countries); set("currencies", data.prefs.currencies);
+          if(data.prefs.language) form.language.value = data.prefs.language;
+          if(data.prefs.horoscope_sign) form.horoscope_sign.value = data.prefs.horoscope_sign;
+          html += `<p class="asknote">${esc(t("askApplied"))}</p>`;
+        }
+        if(data.play && data.play.length && window.BeeUI) html += `<button type="button" class="cta-ghost sm" id="askPlay"><i class="fa-solid fa-headphones" aria-hidden="true"></i> ${esc(t("askPlay"))} (${data.play.length})</button>`;
+        out.innerHTML = html;
+        const pb = out.querySelector("#askPlay"); if(pb) pb.onclick = ()=>{ dlg.close(); BeeUI.playIds(data.play); };
+      }catch(e){ out.innerHTML = `<p class="err">${esc(e.message||t("askOff"))}</p>`; }
+      finally{ askGo.disabled = false; askGo.textContent = t("askGo"); }
+    };
+  }
   form.onsubmit = async (e)=>{
     e.preventDefault();
     const fd = new FormData(form);
@@ -212,6 +350,7 @@ function customiseView(){
       if(sb && session){
         const {error} = await withTimeout(sb.from("user_preferences").upsert(Object.assign({user_id:session.user.id}, next)), 15000);
         if(error) throw error;
+        sb.from("push_subscriptions").update({sections:next.sections, lang:next.language||lang}).eq("user_id", session.user.id).then(()=>{});
       }
       prefs = Object.assign({}, DEFAULTS, next); saveLocal(prefs);
       dlg.close();
@@ -229,7 +368,8 @@ window.BN = {
   openSignUp: ()=>openDialog(()=>authView(sb?"signup":"signin")),
   openCustomise: ()=>openDialog(customiseView),
   toast: (a,b)=>toast(a,b),
-  refresh: ()=>{ renderForYou(); }
+  refresh: ()=>{ renderForYou(); },
+  saveRemote, track, sb
 };
 acctBtn.onclick = ()=> openDialog(session ? accountView : ()=>authView("signin"));
 custBtn.onclick = ()=> openDialog(customiseView);
@@ -271,7 +411,7 @@ function showForYou(){
 function savedBox(){
   const items = S.filter(st=>SAVED.has(st.id)).slice(0,5);
   if(!items.length) return "";
-  return `<div class="fy-box sc-all"><h3><i class="fa-solid fa-bookmark" aria-hidden="true"></i> ${esc(t("savedStories"))}</h3><ul class="fy-saved">${items.map(st=>`<li><a href="${esc(st.url)}" target="_blank" rel="noopener noreferrer">${esc(SH(st))}</a></li>`).join("")}</ul></div>`;
+  return `<div class="fy-box sc-all"><h3><i class="fa-solid fa-bookmark" aria-hidden="true"></i> ${esc(t("savedStories"))}</h3><ul class="fy-saved">${items.map(st=>`<li><a href="/story/${encodeURIComponent(st.id)}">${esc(SH(st))}</a></li>`).join("")}</ul></div>`;
 }
 function refreshChrome(){
   const nm = session ? (profileName || (session.user.email||"").split("@")[0] || t("account")) : t("signIn");
@@ -334,15 +474,61 @@ async function loadRemotePrefs(){
   const uid = session.user.id;
   const [p, pr] = await Promise.all([
     sb.from("user_preferences").select("*").eq("user_id", uid).maybeSingle(),
-    sb.from("profiles").select("display_name").eq("id", uid).maybeSingle()
+    sb.from("profiles").select("*").eq("id", uid).maybeSingle()
   ]);
-  if(pr.data) profileName = pr.data.display_name || "";
+  if(pr.data){
+    profileName = pr.data.display_name || "";
+    // only enforce once the launch migration has added the consent columns
+    needsConsent = ("terms_version" in pr.data) && pr.data.terms_version !== TERMS_VERSION;
+  }
+  syncSaved().catch(e=>console.warn("BeeNews: saved stories sync:", e.message||e));
   if(p.data){
     prefs = Object.assign({}, DEFAULTS, {language:p.data.language, sections:p.data.sections||[], countries:p.data.countries||[],
       horoscope_sign:p.data.horoscope_sign, currencies:p.data.currencies||DEFAULTS.currencies});
     saveLocal(prefs);
   }
 }
+
+/* ---------- saved stories and reading history, synced to the account ---------- */
+async function syncSaved(){
+  if(!sb || !session) return;
+  const uid = session.user.id;
+  const {data, error} = await sb.from("saved_stories").select("story_id").eq("user_id", uid);
+  if(error) return;                              // table not created yet: keep device-only saving
+  const remote = new Set(data.map(r=>r.story_id));
+  const known = new Set(S.map(x=>x.id));
+  const up = [...SAVED].filter(id=>!remote.has(id) && known.has(id)).map(id=>({user_id:uid, story_id:id}));
+  if(up.length) await sb.from("saved_stories").upsert(up, {onConflict:"user_id,story_id", ignoreDuplicates:true});
+  remote.forEach(id=>SAVED.add(id));
+  try{ localStorage.setItem("beenews-saved", JSON.stringify([...SAVED])); }catch(e){}
+  renderForYou();
+}
+function saveRemote(id, on){
+  if(!sb || !session) return;
+  const q = on ? sb.from("saved_stories").upsert({user_id:session.user.id, story_id:id}, {onConflict:"user_id,story_id", ignoreDuplicates:true})
+               : sb.from("saved_stories").delete().eq("user_id", session.user.id).eq("story_id", id);
+  q.then(r=>{ if(r.error) console.warn("BeeNews: saved sync:", r.error.message); });
+  if(on) track("save");
+}
+
+/* ---------- privacy-respecting analytics and crash reports ---------- */
+// Only daily totals per event are stored (no account ID, no IP). Turned off when config.analytics === false.
+const tracked = new Set();
+function track(name, key){
+  if(!sb || CFG.analytics === false) return;
+  const k = name+"|"+(key||"");
+  if(name!=="listen" && tracked.has(k)) return;   // count each thing once per page view
+  tracked.add(k);
+  sb.rpc("track",{event_name:name, event_key:String(key||"").slice(0,80)}).then(()=>{},()=>{});
+}
+let errCount = 0;
+function reportError(message, source){
+  if(!sb || errCount++ >= 5) return;
+  sb.rpc("log_client_error",{message:String(message||"").slice(0,500), source:String(source||"").slice(0,200),
+    page:location.pathname, agent:navigator.userAgent.slice(0,200)}).then(()=>{},()=>{});
+}
+window.addEventListener("error", e=>reportError(e.message, (e.filename||"")+":"+(e.lineno||"")));
+window.addEventListener("unhandledrejection", e=>reportError(e.reason && (e.reason.message||e.reason), "promise"));
 
 /* ---------- start ---------- */
 const log = (...a)=>console.info("BeeNews:", ...a);
@@ -367,6 +553,8 @@ async function start(){
   await Promise.all(tasks);
   safe("render edition", buildChrome);
   safe("apply preferences", applyPrefs);
+  promptConsentIfNeeded();
+  track("page_view", location.pathname==="/"?"home":location.pathname);
   // 4. React to sign-in and sign-out from now on. Supabase holds an auth lock while this callback runs,
   //    so the callback only records the event and defers any Supabase calls.
   let lastUid = session ? session.user.id : null;
@@ -375,8 +563,8 @@ async function start(){
     setTimeout(async ()=>{
       log("auth event:", event);
       if(event==="PASSWORD_RECOVERY"){ openDialog(()=>authView("newpass")); return; }
-      if(event==="SIGNED_IN" && s && s.user.id!==lastUid){ lastUid = s.user.id; try{ await loadRemotePrefs(); }catch(e){ console.warn(e); } safe("apply preferences", applyPrefs); }
-      if(event==="SIGNED_OUT"){ lastUid = null; profileName=""; safe("show page", showView); }
+      if(event==="SIGNED_IN" && s && s.user.id!==lastUid){ lastUid = s.user.id; try{ await loadRemotePrefs(); }catch(e){ console.warn(e); } safe("apply preferences", applyPrefs); promptConsentIfNeeded(); }
+      if(event==="SIGNED_OUT"){ lastUid = null; profileName=""; needsConsent = false; safe("show page", showView); }
       safe("update header", refreshChrome);
     }, 0);
   });

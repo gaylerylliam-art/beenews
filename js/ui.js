@@ -40,6 +40,7 @@ function toggleSave(id){
   });
   note(on ? t("saved") : t("removed"));
   if(window.BN && BN.refresh) BN.refresh();
+  if(window.BN && BN.saveRemote) BN.saveRemote(id, on);
 }
 
 /* ---------------- read-aloud player ---------------- */
@@ -56,6 +57,7 @@ const storyText = st => `${SH(st)}. ${SS(st)} ${t("sourceL")}: ${st.pub}.`;
 function speakCurrent(){
   const st = queue[qi]; if(!st) return stop();
   synth.cancel();
+  if(window.BN && BN.track) BN.track("listen", st.id);
   const text = storyText(st);
   utter = new SpeechSynthesisUtterance(text);
   utter.lang = ({en:"en-GB",ar:"ar-AE",fr:"fr-FR",de:"de-DE"})[lang] || "en-GB";
@@ -121,7 +123,7 @@ function renderSearch(){
   const evHits = EV.filter(e=>(EN(e)+" "+e.n+" "+e.venue).toLowerCase().includes(q)).slice(0,3);
   if(!hits.length && !evHits.length){ $("searchRes").innerHTML = `<li class="sb-none">${esc(t("noResults"))}</li>`; return; }
   $("searchRes").innerHTML = hits.map(st=>`<li class="sc-${SECCLS[st.sec]}"><span class="sb-ic"><i class="fa-solid ${SECICON[st.sec]}" aria-hidden="true"></i></span>
-      <a href="${esc(st.url)}" target="_blank" rel="noopener noreferrer"><b>${esc(SH(st))}</b><small>${esc(secName(st.sec))} · ${esc(st.pub)} · ${ago(st)}</small></a>
+      <a href="/story/${encodeURIComponent(st.id)}"><b>${esc(SH(st))}</b><small>${esc(secName(st.sec))} · ${esc(st.pub)} · ${ago(st)}</small></a>
       <button type="button" class="act listen sm" data-listen="${esc(st.id)}" aria-label="${esc(t("listen"))}"><i class="fa-solid fa-volume-high" aria-hidden="true"></i></button></li>`).join("")
     + evHits.map(e=>`<li class="sc-events"><span class="sb-ic"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i></span>
       <a href="${esc(e.url)}" target="_blank" rel="noopener noreferrer"><b>${esc(EN(e))}</b><small>${esc(t("evTitle"))} · ${esc(evWhen(e))}</small></a></li>`).join("");
@@ -239,6 +241,7 @@ addEventListener("scroll", ()=>{
   lastY = y;
 }, {passive:true});
 
+window.BeeUI = { playIds: ids => play(ids.map(id=>S.find(x=>x.id===id))) };
 setLabels(); renderPray(); renderWx(); loadWx();
 setInterval(renderPray, 60000);
 setInterval(loadWx, 30*60000);

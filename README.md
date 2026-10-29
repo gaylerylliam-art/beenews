@@ -18,6 +18,19 @@ the original publishers, and can create an account to customise the homepage the
 | `supabase/seed.sql` | The first edition: 52 stories, 24 events, rates, market quotes, horoscopes, with translations |
 | `manifest.webmanifest`, `sw.js`, `icons/` | Makes BeeNews installable on phones and desktops |
 | `tools/gen_seed.js` | Regenerates `seed.sql` from the edition in `index.html` |
+| `story.html`, `js/story.js` | One page per story at `/story/<id>`: BeeNews brief, Listen, Save, Share, corrections, Report an error |
+| `privacy.html`, `terms.html`, `editorial.html` | Legal pages (drafts for legal review), built from `tools/legal_content.py` |
+| `contact.html`, `corrections.html` | Contact page with licence status, public corrections log |
+| `admin.html`, `js/admin.js` | Newsroom: review queue, editing, approval, corrections, reports, sources, usage |
+| `js/page.js`, `css/pages.css` | Shared header/footer/language for the sub-pages |
+| `images/cards/` | Section header artwork on story cards |
+| `netlify/edge-functions/` | Share previews for story links, `/sitemap.xml` |
+| `supabase/migrations/…_launch.sql` | Launch features: consent, saved/history sync, reports, sources, feed queue, audit log, alerts, analytics, crash log |
+| `supabase/functions/` | `ingest` (daily feeds → review queue), `ask` (Ask BeeNews), `editor-ai` (translation drafts), `notify` (breaking alerts) |
+| `supabase/templates/` | Branded sign-up, password-reset and sign-in emails |
+| `android/`, `ios/`, `capacitor.config.json`, `js/native.js` | Store-ready apps (Capacitor) |
+
+**Launching?** Follow [`LAUNCH.md`](LAUNCH.md) step by step.
 
 ## Demo mode
 With `config.js` left empty the app runs on its own: it shows the bundled edition, and "Customise" saves

@@ -1,0 +1,23 @@
+{
+  "name": "beenews",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BeeNews: Bee the First to Know. Verified UAE news as a website and as iOS and Android apps.",
+  "scripts": {
+    "build:www": "node tools/build-www.mjs",
+    "cap:sync": "npm run build:www && npx cap sync",
+    "android": "npm run cap:sync && npx cap open android",
+    "ios": "npm run cap:sync && npx cap open ios",
+    "pages": "python3 tools/build_pages.py"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/browser": "8.0.5",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/ios": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}

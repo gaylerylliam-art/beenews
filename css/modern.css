@@ -410,3 +410,17 @@ body.has-player .totop{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .rail.compact .logo-full{display:none !important}
 @media (max-width:760px){ .logo-full{height:104px} }
 #rail.compact .logo-full{display:none !important}
+.ft-legal{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center;padding:14px 0 4px;border-top:1px solid var(--rule);font:600 13px var(--f-ui)}
+.ft-legal a{color:var(--ink-2);text-decoration:none}.ft-legal a:hover{color:var(--bee-2)}
+.ft-legal span{color:var(--muted);font-weight:500}
+a.hlink{color:inherit;text-decoration:none;display:block}
+a.hlink:hover .sp-h,a.hlink:hover .sp-lead{text-decoration:underline;text-decoration-color:var(--bee);text-decoration-thickness:2px;text-underline-offset:4px}
+a.hlink:focus-visible{outline:2px solid var(--bee);outline-offset:3px;border-radius:6px}
+/* section header art (images/cards) */
+.card .art.has-img{background-color:#0f172a !important;background-size:cover !important;background-position:center right !important;height:132px}
+.card .art.has-img::before{display:none}
+.card .art.has-img::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,6,23,.35),transparent 45%)}
+.card:hover .art.has-img{filter:saturate(1.08) brightness(1.04)}
+.card .art.has-img{transition:filter .4s}
+.hero-art.has-img{background-size:cover !important;background-position:center right !important}
+.hero-art.has-img::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#0b1220 30%,rgba(11,18,32,.72) 58%,rgba(11,18,32,.25) 100%)}

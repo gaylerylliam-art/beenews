@@ -1,7 +1,9 @@
-# BeeNews on Netlify: a static site, no build step.
+# BeeNews on Netlify: a static site. The build only copies the web files into dist/
+# (so the app projects, tools and node_modules are never published).
 [build]
-  publish = "."
-  command = ""
+  publish = "dist"
+  command = "node tools/build-www.mjs --web"
+  edge_functions = "netlify/edge-functions"
 
 # Pages, scripts and styles keep the same file names between releases,
 # so browsers re-check them on every visit and always get the latest design.
@@ -41,3 +43,16 @@
   for = "/icons/*"
   [headers.values]
     Cache-Control = "public, max-age=604800"
+
+# One page per story: /story/<id> is served by story.html (the edge function adds share previews).
+[[redirects]]
+  from = "/story/*"
+  to = "/story.html"
+  status = 200
+
+# The editor dashboard must never be cached or indexed.
+[[headers]]
+  for = "/admin.html"
+  [headers.values]
+    Cache-Control = "no-store"
+    X-Robots-Tag = "noindex"

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Contact · BeeNews</title>
+<meta name="description" content="Contact the BeeNews newsroom, report an error or ask about your data.">
+<meta name="theme-color" content="#0f172a">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="/css/app.css">
+<link rel="stylesheet" href="/css/modern.css">
+<link rel="stylesheet" href="/css/pages.css">
+<style>
+.ct-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:22px;align-items:start}
+.ct-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.ct-list li{display:flex;gap:12px;font:500 14.5px/1.5 var(--f-ui);color:var(--ink-2)}
+.ct-list i{color:var(--bee-2);width:18px;margin-top:3px}
+.ct-list b{display:block;color:var(--ink);font-weight:800}
+.licence{display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--bee) 20%,var(--surface));border:1px dashed var(--bee-2);border-radius:999px;padding:5px 12px;font:700 12.5px var(--f-ui);color:var(--ink)}
+@media (max-width:760px){.ct-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header id="pgHead"></header>
+<main class="pg-main doc">
+  <h1 data-t="ctTitle">Contact BeeNews</h1>
+  <p class="updated" data-t="ctIntro">Questions, corrections, complaints or data requests: we read every message.</p>
+  <div class="ct-grid">
+    <section class="card-box">
+      <ul class="ct-list">
+        <li><i class="fa-solid fa-building" aria-hidden="true"></i><div><b data-t="ctPublisher">Publisher</b><span class="ph">Company legal name</span><br><span class="ph">Trade licence no. · issuing authority</span></div></li>
+        <li><i class="fa-solid fa-id-card" aria-hidden="true"></i><div><b data-t="ctLicence">Media licence (UAE Media Council)</b><span class="licence"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span data-t="ctLicenceVal">Application in progress</span></span><br><span class="ph" data-t="ctLicenceNo">Licence number to be added once issued</span></div></li>
+        <li><i class="fa-solid fa-user-pen" aria-hidden="true"></i><div><b data-t="ctEditor">Editor-in-chief</b><span class="ph">Name</span> · <span class="ph">editor@your-domain</span></div></li>
+        <li><i class="fa-solid fa-envelope" aria-hidden="true"></i><div><b data-t="ctGeneral">General enquiries</b><span class="ph">hello@your-domain</span></div></li>
+        <li><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><div><b data-t="ctPrivacy">Privacy and data requests</b><span class="ph">privacy@your-domain</span></div></li>
+        <li><i class="fa-solid fa-location-dot" aria-hidden="true"></i><div><b data-t="ctAddress">Address</b><span class="ph">Registered address, Dubai, UAE</span></div></li>
+      </ul>
+    </section>
+    <section class="card-box">
+      <h2 style="margin-top:0" data-t="ctFormTitle">Send us a message</h2>
+      <form class="form" id="ctForm" novalidate>
+        <label><span data-t="ctTopic">Topic</span>
+          <select id="ctKind">
+            <option value="contact" data-t="ctKContact">General question</option>
+            <option value="factual" data-t="ctKFact">A story has a factual error</option>
+            <option value="translation" data-t="ctKTrans">A translation is wrong</option>
+            <option value="link" data-t="ctKLink">A link is broken</option>
+            <option value="offensive" data-t="ctKOff">Content is offensive or unlawful</option>
+            <option value="other" data-t="ctKOther">Something else</option>
+          </select></label>
+        <label><span data-t="ctMsg">Message</span><textarea id="ctMsg" maxlength="2000" required></textarea>
+          <span class="hint" data-t="ctMsgHint">If it is about a story, paste its link or headline.</span></label>
+        <label><span data-t="ctEmail">Your email (optional, so we can reply)</span><input id="ctEmail" type="email" autocomplete="email"></label>
+        <p class="hint" style="margin:0"><span data-t="ctPrivNote">We use your message only to reply and fix the problem. See our</span> <a href="/privacy.html" data-t="privacy">Privacy policy</a>.</p>
+        <button class="btn btn-amber" id="ctSend" type="submit"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i><span data-t="ctSend">Send</span></button>
+        <div id="ctMsgBox" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+  </div>
+</main>
+<footer id="pgFoot"></footer>
+<script src="/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/js/page.js"></script>
+<script>
+(function(){
+const {$} = BNP;
+BNP.addStrings({
+  en:{ctTitle:"Contact BeeNews",ctIntro:"Questions, corrections, complaints or data requests: we read every message.",ctPublisher:"Publisher",ctLicence:"Media licence (UAE Media Council)",ctLicenceVal:"Application in progress",ctLicenceNo:"Licence number to be added once issued",ctEditor:"Editor-in-chief",ctGeneral:"General enquiries",ctPrivacy:"Privacy and data requests",ctAddress:"Address",ctFormTitle:"Send us a message",ctTopic:"Topic",ctKContact:"General question",ctKFact:"A story has a factual error",ctKTrans:"A translation is wrong",ctKLink:"A link is broken",ctKOff:"Content is offensive or unlawful",ctKOther:"Something else",ctMsg:"Message",ctMsgHint:"If it is about a story, paste its link or headline.",ctEmail:"Your email (optional, so we can reply)",ctPrivNote:"We use your message only to reply and fix the problem. See our",ctSend:"Send",ctSending:"Sending…",ctOk:"Thank you. Your message reached the newsroom.",ctShort:"Please write at least a few words.",ctBadEmail:"Please check the email address.",ctFail:"Sorry, we couldn't send that. Please try again or email us."},
+  ar:{ctTitle:"تواصل مع بي نيوز",ctIntro:"أسئلة أو تصحيحات أو شكاوى أو طلبات تتعلق بالبيانات: نقرأ كل رسالة.",ctPublisher:"الناشر",ctLicence:"الترخيص الإعلامي (مجلس الإمارات للإعلام)",ctLicenceVal:"الطلب قيد الإجراء",ctLicenceNo:"يُضاف رقم الترخيص بعد صدوره",ctEditor:"رئيس التحرير",ctGeneral:"الاستفسارات العامة",ctPrivacy:"الخصوصية وطلبات البيانات",ctAddress:"العنوان",ctFormTitle:"أرسل لنا رسالة",ctTopic:"الموضوع",ctKContact:"سؤال عام",ctKFact:"خطأ في معلومة بخبر",ctKTrans:"خطأ في الترجمة",ctKLink:"رابط لا يعمل",ctKOff:"محتوى مسيء أو مخالف للقانون",ctKOther:"أمر آخر",ctMsg:"الرسالة",ctMsgHint:"إن كانت تخص خبراً فالصق رابطه أو عنوانه.",ctEmail:"بريدك الإلكتروني (اختياري للرد عليك)",ctPrivNote:"نستخدم رسالتك فقط للرد وإصلاح المشكلة. راجع",ctSend:"إرسال",ctSending:"جارٍ الإرسال…",ctOk:"شكراً لك. وصلت رسالتك إلى فريق التحرير.",ctShort:"يرجى كتابة بضع كلمات على الأقل.",ctBadEmail:"يرجى التحقق من البريد الإلكتروني.",ctFail:"عذراً، تعذّر الإرسال. حاول مجدداً أو راسلنا بالبريد."},
+  fr:{ctTitle:"Contacter BeeNews",ctIntro:"Questions, corrections, plaintes ou demandes sur vos données : nous lisons chaque message.",ctPublisher:"Éditeur",ctLicence:"Licence média (UAE Media Council)",ctLicenceVal:"Demande en cours",ctEditor:"Rédacteur en chef",ctGeneral:"Demandes générales",ctPrivacy:"Confidentialité et données",ctAddress:"Adresse",ctFormTitle:"Envoyez-nous un message",ctTopic:"Sujet",ctKContact:"Question générale",ctKFact:"Erreur factuelle dans un article",ctKTrans:"Traduction incorrecte",ctKLink:"Lien cassé",ctKOff:"Contenu offensant ou illégal",ctKOther:"Autre",ctMsg:"Message",ctMsgHint:"S'il s'agit d'un article, collez son lien ou son titre.",ctEmail:"Votre e-mail (facultatif, pour vous répondre)",ctPrivNote:"Nous utilisons votre message uniquement pour répondre. Voir notre",ctSend:"Envoyer",ctSending:"Envoi…",ctOk:"Merci. Votre message est bien arrivé.",ctShort:"Écrivez au moins quelques mots.",ctBadEmail:"Vérifiez l'adresse e-mail.",ctFail:"Échec de l'envoi. Réessayez ou écrivez-nous."},
+  de:{ctTitle:"BeeNews kontaktieren",ctIntro:"Fragen, Korrekturen, Beschwerden oder Datenanfragen: Wir lesen jede Nachricht.",ctPublisher:"Herausgeber",ctLicence:"Medienlizenz (UAE Media Council)",ctLicenceVal:"Antrag läuft",ctEditor:"Chefredaktion",ctGeneral:"Allgemeine Anfragen",ctPrivacy:"Datenschutz und Datenanfragen",ctAddress:"Adresse",ctFormTitle:"Schreiben Sie uns",ctTopic:"Thema",ctKContact:"Allgemeine Frage",ctKFact:"Sachfehler in einer Meldung",ctKTrans:"Fehlerhafte Übersetzung",ctKLink:"Defekter Link",ctKOff:"Anstößiger oder rechtswidriger Inhalt",ctKOther:"Etwas anderes",ctMsg:"Nachricht",ctMsgHint:"Bei einer Meldung bitte Link oder Überschrift einfügen.",ctEmail:"Ihre E-Mail (optional, für eine Antwort)",ctPrivNote:"Wir nutzen Ihre Nachricht nur zur Antwort. Siehe",ctSend:"Senden",ctSending:"Wird gesendet…",ctOk:"Danke. Ihre Nachricht ist angekommen.",ctShort:"Bitte schreiben Sie ein paar Worte.",ctBadEmail:"Bitte E-Mail-Adresse prüfen.",ctFail:"Senden fehlgeschlagen. Bitte erneut versuchen oder per E-Mail schreiben."}
+});
+BNP.render();
+const params = new URLSearchParams(location.search);
+if(params.get("kind")) $("ctKind").value = params.get("kind");
+if(params.get("story")) $("ctMsg").value = "Story: " + location.origin + "/story/" + params.get("story") + "\n\n";
+function show(cls, key){ $("ctMsgBox").className = "msg " + cls; $("ctMsgBox").textContent = BNP.t(key); }
+$("ctForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const message = $("ctMsg").value.trim(), email = $("ctEmail").value.trim();
+  if(message.length < 5) return show("err","ctShort");
+  if(email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return show("err","ctBadEmail");
+  if(!BNP.sb) return show("err","ctFail");
+  const btn = $("ctSend"); btn.disabled = true; btn.querySelector("span").textContent = BNP.t("ctSending");
+  try{
+    const {data:{session}} = await BNP.sb.auth.getSession();
+    const m = /\/story\/([A-Za-z0-9_-]+)/.exec(message);
+    const {error} = await BNP.sb.from("error_reports").insert({
+      kind: $("ctKind").value, message, contact_email: email || null,
+      story_id: m ? m[1] : null, user_id: session ? session.user.id : null });
+    if(error) throw error;
+    $("ctForm").reset(); show("ok","ctOk");
+    BNP.sb.rpc("track",{event_name:"report_error", event_key:"contact"}).then(()=>{},()=>{});
+  }catch(err){ console.warn("BeeNews: contact", err); show("err","ctFail"); }
+  finally{ btn.disabled = false; btn.querySelector("span").textContent = BNP.t("ctSend"); }
+});
+})();
+</script>
+</body>
+</html>
