@@ -203,7 +203,7 @@ function customiseView(){
         msg(t("cSaved"),"ok");
       } else msg(t("cSavedLocal"),"ok");
       applyPrefs();
-      setTimeout(()=>{ if(dlg.open) dlg.close(); }, 900);
+      setTimeout(()=>{ if(dlg.open) dlg.close(); showForYou(); }, 900);
     }catch(err){ msg(friendlyError(err),"error"); }
     finally{ busy(form,false); }
   };
@@ -237,6 +237,11 @@ function renderForYou(){
   fy.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>openDialog(b.dataset.act==="cust"?customiseView:()=>authView("signin")));
 }
 
+function showForYou(){
+  if(state.sec!=="All") selectTab("All");
+  const y = fy.getBoundingClientRect().top + window.scrollY - $("rail").offsetHeight - 12;
+  window.scrollTo({top:Math.max(0,y), behavior:(typeof REDUCE!=="undefined" && REDUCE)?"auto":"smooth"});
+}
 function refreshChrome(){
   acctBtn.textContent = session ? (profileName || (session.user.email||"").split("@")[0] || t("account")) : t("signIn");
   acctBtn.dataset.state = session ? "in" : "out";
@@ -256,14 +261,20 @@ function applyPrefs(){
 /* ---------- live content from Supabase ---------- */
 async function loadContent(){
   const today = dubaiDate(new Date());
-  const [st, ev, fxr, mq, hr] = await Promise.all([
+  const settled = await Promise.allSettled([
     sb.from("stories").select("*").eq("status","published").order("published_at",{ascending:false}).limit(300),
     sb.from("events").select("*").eq("status","published"),
     sb.from("fx_rates").select("*").order("sort"),
     sb.from("market_quotes").select("*").order("sort"),
     sb.from("horoscopes").select("*").eq("day", today)
   ]);
-  for (const r of [st,ev,fxr,mq,hr]) if(r.error) throw r.error;
+  const names = ["stories","events","fx_rates","market_quotes","horoscopes"];
+  const [st, ev, fxr, mq, hr] = settled.map((r,i)=>{
+    const v = r.status==="fulfilled" ? r.value : {data:null, error:r.reason};
+    if(v.error){ console.warn("BeeNews: could not load "+names[i]+" from Supabase:", v.error.message||v.error); return {data:[]}; }
+    return {data:v.data||[]};
+  });
+  window.BEENEWS_STATUS = {connected:true, stories:st.data.length, events:ev.data.length};
   if(st.data.length){
     S.splice(0, S.length, ...st.data.map(r=>({id:r.id, sec:r.section, country:r.country, lab:r.label, sens:r.sensitive && !r.editor_approved,
       h:r.headline, s:r.summary, pub:r.publisher, t:r.published_at, dateOnly:r.date_only, url:r.url, section:r.link_is_section,
@@ -304,7 +315,7 @@ async function loadRemotePrefs(){
 /* ---------- start ---------- */
 async function start(){
   refreshChrome();
-  if(!sb){ applyPrefs(); return; }
+  if(!sb){ window.BEENEWS_STATUS = {connected:false, reason:"demo mode: config.js has no Supabase URL/key"}; applyPrefs(); return; }
   try{ await loadContent(); }catch(e){ console.warn("BeeNews: content load failed", e); }
   buildChrome();
   const {data} = await sb.auth.getSession();
