@@ -14,7 +14,7 @@ let session = null, profileName = "", prefs = loadLocal();
 
 /* ---------- strings ---------- */
 const BT = {
- en:{signIn:"Sign in",account:"Account",customise:"Customise",forYou:"For You",fyEmptyH:"Make BeeNews yours",
+ en:{cSaving:"Saving…",cUpdated:"Your homepage is updated",cUpdatedSub:"Your picks now appear first under For You.",cUpdatedLocal:"Saved on this device. Sign in to keep it on all your devices.",fyPickMore:"Choose sections or countries to see your stories here.",errSlow:"Saving is taking too long. Check your connection and try again.",view:"View",signIn:"Sign in",account:"Account",customise:"Customise",forYou:"For You",fyEmptyH:"Make BeeNews yours",
   fyEmptyP:"Choose the sections and countries you always want to see first, plus your currencies and star sign.",
   fyEdit:"Edit",fyNone:"No stories match your picks in this edition yet.",myMarkets:"My currencies",mySign:"My sign",
   cTitle:"Customise my homepage",cSections:"Sections to feature",cCountries:"Countries to follow",cLang:"Language",
@@ -30,7 +30,7 @@ const BT = {
   mSignedInAs:"Signed in as",mSignOut:"Sign out",mDelete:"Delete account",mDeleteQ:"This permanently deletes your account and saved preferences.",
   mDeleteYes:"Yes, delete my account",mDeleted:"Your account has been deleted.",close:"Close",
   errGeneric:"Something went wrong. Please try again.",errOffline:"Couldn't reach BeeNews. Showing the saved edition."},
- ar:{signIn:"تسجيل الدخول",account:"الحساب",customise:"تخصيص",forYou:"لك",fyEmptyH:"اجعل BeeNews على ذوقك",
+ ar:{cSaving:"جارٍ الحفظ…",cUpdated:"تم تحديث صفحتك الرئيسية",cUpdatedSub:"تظهر اختياراتك الآن أولاً في قسم «لك».",cUpdatedLocal:"حُفظت على هذا الجهاز. سجّل الدخول لتبقى على كل أجهزتك.",fyPickMore:"اختر أقساماً أو دولاً لتظهر أخبارك هنا.",errSlow:"الحفظ يستغرق وقتاً طويلاً. تحقق من الاتصال وحاول مجدداً.",view:"عرض",signIn:"تسجيل الدخول",account:"الحساب",customise:"تخصيص",forYou:"لك",fyEmptyH:"اجعل BeeNews على ذوقك",
   fyEmptyP:"اختر الأقسام والدول التي تريد رؤيتها أولاً، إضافة إلى عملاتك وبرجك.",
   fyEdit:"تعديل",fyNone:"لا توجد أخبار تطابق اختياراتك في هذا العدد بعد.",myMarkets:"عملاتي",mySign:"برجي",
   cTitle:"تخصيص صفحتي الرئيسية",cSections:"الأقسام المفضلة",cCountries:"الدول التي أتابعها",cLang:"اللغة",
@@ -46,7 +46,7 @@ const BT = {
   mSignedInAs:"مسجّل باسم",mSignOut:"تسجيل الخروج",mDelete:"حذف الحساب",mDeleteQ:"سيُحذف حسابك وتفضيلاتك المحفوظة نهائياً.",
   mDeleteYes:"نعم، احذف حسابي",mDeleted:"تم حذف حسابك.",close:"إغلاق",
   errGeneric:"حدث خطأ. حاول مرة أخرى.",errOffline:"تعذّر الوصول إلى BeeNews. نعرض العدد المحفوظ."},
- fr:{signIn:"Se connecter",account:"Compte",customise:"Personnaliser",forYou:"Pour vous",fyEmptyH:"Faites de BeeNews votre journal",
+ fr:{cSaving:"Enregistrement…",cUpdated:"Votre page d'accueil est à jour",cUpdatedSub:"Vos choix apparaissent désormais en tête, dans Pour vous.",cUpdatedLocal:"Enregistré sur cet appareil. Connectez-vous pour le retrouver partout.",fyPickMore:"Choisissez des rubriques ou des pays pour voir vos articles ici.",errSlow:"L'enregistrement prend trop de temps. Vérifiez votre connexion et réessayez.",view:"Voir",signIn:"Se connecter",account:"Compte",customise:"Personnaliser",forYou:"Pour vous",fyEmptyH:"Faites de BeeNews votre journal",
   fyEmptyP:"Choisissez les rubriques et pays à voir en premier, ainsi que vos devises et votre signe.",
   fyEdit:"Modifier",fyNone:"Aucun article ne correspond encore à vos choix dans cette édition.",myMarkets:"Mes devises",mySign:"Mon signe",
   cTitle:"Personnaliser ma page d'accueil",cSections:"Rubriques à mettre en avant",cCountries:"Pays à suivre",cLang:"Langue",
@@ -62,7 +62,7 @@ const BT = {
   mSignedInAs:"Connecté en tant que",mSignOut:"Se déconnecter",mDelete:"Supprimer le compte",mDeleteQ:"Votre compte et vos préférences seront définitivement supprimés.",
   mDeleteYes:"Oui, supprimer mon compte",mDeleted:"Votre compte a été supprimé.",close:"Fermer",
   errGeneric:"Une erreur s'est produite. Réessayez.",errOffline:"BeeNews est injoignable. Affichage de l'édition enregistrée."},
- de:{signIn:"Anmelden",account:"Konto",customise:"Anpassen",forYou:"Für Sie",fyEmptyH:"Machen Sie BeeNews zu Ihrer Zeitung",
+ de:{cSaving:"Wird gespeichert…",cUpdated:"Ihre Startseite ist aktualisiert",cUpdatedSub:"Ihre Auswahl steht jetzt oben unter „Für Sie“.",cUpdatedLocal:"Auf diesem Gerät gespeichert. Melden Sie sich an, um es überall zu haben.",fyPickMore:"Wählen Sie Rubriken oder Länder, um hier Ihre Meldungen zu sehen.",errSlow:"Das Speichern dauert zu lange. Prüfen Sie die Verbindung und versuchen Sie es erneut.",view:"Ansehen",signIn:"Anmelden",account:"Konto",customise:"Anpassen",forYou:"Für Sie",fyEmptyH:"Machen Sie BeeNews zu Ihrer Zeitung",
   fyEmptyP:"Wählen Sie Rubriken und Länder, die Sie zuerst sehen möchten, dazu Ihre Währungen und Ihr Sternzeichen.",
   fyEdit:"Bearbeiten",fyNone:"In dieser Ausgabe passen noch keine Meldungen zu Ihrer Auswahl.",myMarkets:"Meine Währungen",mySign:"Mein Sternzeichen",
   cTitle:"Startseite anpassen",cSections:"Bevorzugte Rubriken",cCountries:"Länder folgen",cLang:"Sprache",
@@ -96,6 +96,18 @@ $("tabs").parentNode.insertBefore(custBtn, $("ftoggle"));
 const fy = h("section",{id:"foryou",class:"foryou","aria-labelledby":"fyTitle"});
 $("index").parentNode.insertBefore(fy, $("index"));
 const dlg = h("dialog",{id:"bnDialog",class:"bn-dialog"});
+const toastEl = h("div",{id:"bnToast",class:"bn-toast",role:"status","aria-live":"polite",hidden:""});
+document.body.appendChild(toastEl);
+let toastTimer = null;
+function toast(title, sub, action){
+  toastEl.innerHTML = `<span class="tick" aria-hidden="true">✓</span><div><b>${esc(title)}</b>${sub?`<span>${esc(sub)}</span>`:""}</div>`+
+    (action?`<button type="button" class="tview">${esc(action.label)}</button>`:"")+`<button type="button" class="tx" aria-label="${esc(t("close"))}">×</button>`;
+  toastEl.hidden = false; toastEl.classList.remove("show"); void toastEl.offsetWidth; toastEl.classList.add("show");
+  toastEl.querySelector(".tx").onclick = ()=>{ toastEl.hidden = true; };
+  if(action) toastEl.querySelector(".tview").onclick = ()=>{ toastEl.hidden = true; action.run(); };
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>{ toastEl.hidden = true; }, 6000);
+}
+const withTimeout = (pr, ms) => Promise.race([pr, new Promise((_,rej)=>setTimeout(()=>rej(new Error(t("errSlow"))), ms))]);
 document.body.appendChild(dlg);
 dlg.addEventListener("click", e=>{ if(e.target===dlg) dlg.close(); });
 
@@ -194,18 +206,21 @@ function customiseView(){
     const fd = new FormData(form);
     const next = {language: fd.get("language")||null, sections: fd.getAll("sections"), countries: fd.getAll("countries"),
                   horoscope_sign: fd.get("horoscope_sign")||null, currencies: fd.getAll("currencies")};
-    busy(form,true); msg("");
+    const saveBtn = form.querySelector("button.primary");
+    busy(form,true); msg(""); saveBtn.textContent = t("cSaving");
     try{
-      prefs = Object.assign({}, DEFAULTS, next); saveLocal(prefs);
       if(sb && session){
-        const {error} = await sb.from("user_preferences").upsert(Object.assign({user_id:session.user.id}, next));
+        const {error} = await withTimeout(sb.from("user_preferences").upsert(Object.assign({user_id:session.user.id}, next)), 15000);
         if(error) throw error;
-        msg(t("cSaved"),"ok");
-      } else msg(t("cSavedLocal"),"ok");
+      }
+      prefs = Object.assign({}, DEFAULTS, next); saveLocal(prefs);
+      dlg.close();
       applyPrefs();
-      setTimeout(()=>{ if(dlg.open) dlg.close(); showForYou(); }, 900);
+      showForYou();
+      flashForYou();
+      toast(t("cUpdated"), (sb && session) ? t("cUpdatedSub") : t("cUpdatedLocal"));
     }catch(err){ msg(friendlyError(err),"error"); }
-    finally{ busy(form,false); }
+    finally{ busy(form,false); saveBtn.textContent = t("cSave"); }
   };
 }
 
@@ -217,7 +232,8 @@ function renderForYou(){
   if(state.sec!=="All"){ fy.hidden = true; return; }
   fy.hidden = false;
   const hasPicks = prefs.sections.length || prefs.countries.length;
-  if(!hasPicks){
+  const hasAny = hasPicks || prefs.horoscope_sign || (prefs.currencies.length && prefs.currencies.join()!==DEFAULTS.currencies.join());
+  if(!hasAny){
     fy.innerHTML = `<div class="fy-empty"><div><h2 id="fyTitle">${esc(t("fyEmptyH"))}</h2><p>${esc(t("fyEmptyP"))}</p></div>
       <div class="fy-cta"><button class="cta-solid" type="button" data-act="cust">${esc(t("customise"))}</button>${(!session && sb)?`<button class="cta-ghost" type="button" data-act="signin">${esc(t("signIn"))}</button>`:""}</div></div>`;
   } else {
@@ -230,13 +246,16 @@ function renderForYou(){
     const sg = prefs.horoscope_sign && SIGNS.find(x=>x[0]===prefs.horoscope_sign);
     fy.innerHTML = `<div class="fy-head"><h2 id="fyTitle">${esc(t("forYou"))}</h2><div class="fy-chips">${chips}</div>
         <button class="cta-ghost sm" type="button" data-act="cust">${esc(t("fyEdit"))}</button></div>
-      <div class="fy-body"><div class="fy-grid">${picks.length?picks.map(card).join(""):`<p class="fy-none">${esc(t("fyNone"))}</p>`}</div>
+      <div class="fy-body"><div class="fy-grid">${!hasPicks?`<p class="fy-none">${esc(t("fyPickMore"))} <button type="button" class="link-inline" data-act="cust">${esc(t("customise"))}</button></p>`:picks.length?picks.map(card).join(""):`<p class="fy-none">${esc(t("fyNone"))}</p>`}</div>
       <aside class="fy-side">${cur?`<div class="fy-box sc-markets"><h3>${esc(t("myMarkets"))}</h3><ul>${cur}</ul></div>`:""}
         ${sg?`<div class="fy-box sc-horo"><h3>${esc(t("mySign"))} · ${esc(t(sg[0]))} ${sg[1]}</h3><p>${esc((HORO[lang]||HORO.en)[sg[0]]||"")}</p></div>`:""}</aside></div>`;
   }
   fy.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>openDialog(b.dataset.act==="cust"?customiseView:()=>authView("signin")));
 }
 
+function flashForYou(){
+  fy.classList.remove("flash"); void fy.offsetWidth; fy.classList.add("flash");
+}
 function showForYou(){
   if(state.sec!=="All") selectTab("All");
   const y = fy.getBoundingClientRect().top + window.scrollY - $("rail").offsetHeight - 12;
@@ -322,12 +341,17 @@ async function start(){
   session = data.session;
   if(session){ try{ await loadRemotePrefs(); }catch(e){ console.warn(e); } }
   applyPrefs();
-  sb.auth.onAuthStateChange(async (event, s)=>{
+  // Supabase holds an auth lock while this callback runs; calling Supabase from inside it can hang
+  // every later request (including saves). So the callback only records the event and defers the work.
+  let lastUid = session ? session.user.id : null;
+  sb.auth.onAuthStateChange((event, s)=>{
     session = s;
-    if(event==="PASSWORD_RECOVERY"){ openDialog(()=>authView("newpass")); return; }
-    if(event==="SIGNED_IN"){ try{ await loadRemotePrefs(); }catch(e){} applyPrefs(); }
-    if(event==="SIGNED_OUT"){ profileName=""; showView(); }
-    refreshChrome();
+    setTimeout(async ()=>{
+      if(event==="PASSWORD_RECOVERY"){ openDialog(()=>authView("newpass")); return; }
+      if(event==="SIGNED_IN" && s && s.user.id!==lastUid){ lastUid = s.user.id; try{ await loadRemotePrefs(); }catch(e){ console.warn(e); } applyPrefs(); }
+      if(event==="SIGNED_OUT"){ lastUid = null; profileName=""; showView(); }
+      refreshChrome();
+    }, 0);
   });
 }
 start();
