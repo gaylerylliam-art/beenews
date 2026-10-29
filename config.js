@@ -4,6 +4,6 @@
 // Never put the service_role key in this file.
 // Leave both empty to run in demo mode: the bundled edition is shown and preferences stay on the device.
 window.BEENEWS_CONFIG = {
-  supabaseUrl: "",
+  supabaseUrl: "https://ievzgeyqwacqmdfifhde.supabase.co",
   supabaseAnonKey: ""
 };
