@@ -332,29 +332,43 @@ async function loadRemotePrefs(){
 }
 
 /* ---------- start ---------- */
+const log = (...a)=>console.info("BeeNews:", ...a);
+function safe(label, fn){ try{ return fn(); }catch(e){ console.error("BeeNews: "+label+" failed:", e); } }
 async function start(){
-  refreshChrome();
-  if(!sb){ window.BEENEWS_STATUS = {connected:false, reason:"demo mode: config.js has no Supabase URL/key"}; applyPrefs(); return; }
-  try{ await loadContent(); }catch(e){ console.warn("BeeNews: content load failed", e); }
-  buildChrome();
-  const {data} = await sb.auth.getSession();
-  session = data.session;
-  if(session){ try{ await loadRemotePrefs(); }catch(e){ console.warn(e); } }
-  applyPrefs();
-  // Supabase holds an auth lock while this callback runs; calling Supabase from inside it can hang
-  // every later request (including saves). So the callback only records the event and defers the work.
+  // 1. Show the saved homepage from this device straight away, before any network request.
+  safe("apply saved preferences", ()=>{ refreshChrome(); applyPrefs(); });
+  if(!sb){ window.BEENEWS_STATUS = {connected:false, reason:"demo mode: config.js has no Supabase URL/key"}; log("demo mode (no Supabase config)"); return; }
+  // 2. Restore the sign-in session saved in this browser.
+  try{
+    const {data, error} = await withTimeout(sb.auth.getSession(), 10000);
+    if(error) console.warn("BeeNews: session restore error:", error.message);
+    session = data ? data.session : null;
+    log(session ? "signed in as "+session.user.email : "not signed in (no saved session in this browser)");
+  }catch(e){ console.error("BeeNews: session restore failed:", e.message||e); }
+  safe("update header", refreshChrome);
+  // 3. Load the latest edition and the account's saved homepage in parallel.
+  const tasks = [loadContent().then(()=>log("content loaded:", S.length, "stories,", EV.length, "events"))
+                              .catch(e=>console.warn("BeeNews: content load failed:", e.message||e))];
+  if(session) tasks.push(loadRemotePrefs().then(()=>log("saved homepage loaded from account"))
+                              .catch(e=>console.warn("BeeNews: could not load saved homepage:", e.message||e)));
+  await Promise.all(tasks);
+  safe("render edition", buildChrome);
+  safe("apply preferences", applyPrefs);
+  // 4. React to sign-in and sign-out from now on. Supabase holds an auth lock while this callback runs,
+  //    so the callback only records the event and defers any Supabase calls.
   let lastUid = session ? session.user.id : null;
   sb.auth.onAuthStateChange((event, s)=>{
     session = s;
     setTimeout(async ()=>{
+      log("auth event:", event);
       if(event==="PASSWORD_RECOVERY"){ openDialog(()=>authView("newpass")); return; }
-      if(event==="SIGNED_IN" && s && s.user.id!==lastUid){ lastUid = s.user.id; try{ await loadRemotePrefs(); }catch(e){ console.warn(e); } applyPrefs(); }
-      if(event==="SIGNED_OUT"){ lastUid = null; profileName=""; showView(); }
-      refreshChrome();
+      if(event==="SIGNED_IN" && s && s.user.id!==lastUid){ lastUid = s.user.id; try{ await loadRemotePrefs(); }catch(e){ console.warn(e); } safe("apply preferences", applyPrefs); }
+      if(event==="SIGNED_OUT"){ lastUid = null; profileName=""; safe("show page", showView); }
+      safe("update header", refreshChrome);
     }, 0);
   });
 }
-start();
+start().catch(e=>console.error("BeeNews: startup failed:", e));
 
 /* installable app */
 if("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost")){
