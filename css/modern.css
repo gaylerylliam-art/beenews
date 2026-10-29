@@ -394,3 +394,19 @@ body.has-player .totop{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
   .brand-compact{display:none !important}
 }
 .teaser li span{font-family:var(--f-ui)}
+
+/* ---------- transparent logo, light and dark artwork ---------- */
+.logo-full{background:none !important;padding:0 !important;border-radius:0 !important;box-shadow:none !important;height:124px}
+.ft-logo{background:none;padding:0;border-radius:0}
+.ft-logo img{height:90px;width:auto}
+.logo-full,.ftl{display:none !important}
+:root:not([lang="ar"]) .lg-en.lt, :root[lang="ar"] .lg-ar.lt{display:block !important}
+:root[data-theme="dark"]:not([lang="ar"]) .lg-en.lt, :root[data-theme="dark"][lang="ar"] .lg-ar.lt{display:none !important}
+:root[data-theme="dark"]:not([lang="ar"]) .lg-en.dk, :root[data-theme="dark"][lang="ar"] .lg-ar.dk{display:block !important}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]):not([lang="ar"]) .lg-en.lt, :root:not([data-theme="light"])[lang="ar"] .lg-ar.lt{display:none !important}
+  :root:not([data-theme="light"]):not([lang="ar"]) .lg-en.dk, :root:not([data-theme="light"])[lang="ar"] .lg-ar.dk{display:block !important}
+}
+.rail.compact .logo-full{display:none !important}
+@media (max-width:760px){ .logo-full{height:104px} }
+#rail.compact .logo-full{display:none !important}
