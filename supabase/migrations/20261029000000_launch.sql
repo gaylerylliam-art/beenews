@@ -1,3 +1,4 @@
+-- Safe to run more than once.
 -- BeeNews — launch features
 -- Run after 20261028000000_init.sql. Safe to run once; uses IF NOT EXISTS where Postgres allows.
 
@@ -58,7 +59,9 @@ create table if not exists public.reading_history (
 create index if not exists reading_history_recent on public.reading_history (user_id, read_at desc);
 alter table public.saved_stories   enable row level security;
 alter table public.reading_history enable row level security;
+drop policy if exists "saved: own" on public.saved_stories;
 create policy "saved: own" on public.saved_stories for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+drop policy if exists "history: own" on public.reading_history;
 create policy "history: own" on public.reading_history for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- keep only the latest 200 history rows per reader
@@ -91,9 +94,12 @@ create table if not exists public.error_reports (
   handled_at    timestamptz
 );
 alter table public.error_reports enable row level security;
+drop policy if exists "reports: anyone can submit" on public.error_reports;
 create policy "reports: anyone can submit" on public.error_reports for insert
   with check (status = 'new' and handled_by is null and (user_id is null or user_id = auth.uid()));
-create policy "reports: editors read"   on public.error_reports for select using (public.is_editor());
+drop policy if exists "reports: editors read" on public.error_reports;
+create policy "reports: editors read" on public.error_reports for select using (public.is_editor());
+drop policy if exists "reports: editors update" on public.error_reports;
 create policy "reports: editors update" on public.error_reports for update using (public.is_editor()) with check (public.is_editor());
 
 -- simple flood protection: at most 30 reports per story per hour, 300 overall per hour
@@ -140,7 +146,9 @@ create table if not exists public.story_candidates (
 create index if not exists candidates_new on public.story_candidates (status, published_at desc);
 alter table public.sources          enable row level security;
 alter table public.story_candidates enable row level security;
+drop policy if exists "sources: editors" on public.sources;
 create policy "sources: editors" on public.sources for all using (public.is_editor()) with check (public.is_editor());
+drop policy if exists "candidates: editors" on public.story_candidates;
 create policy "candidates: editors" on public.story_candidates for all using (public.is_editor()) with check (public.is_editor());
 
 -- ---------------------------------------------------------------------------
@@ -155,6 +163,7 @@ create table if not exists public.story_events (
   detail    jsonb
 );
 alter table public.story_events enable row level security;
+drop policy if exists "events log: editors read" on public.story_events;
 create policy "events log: editors read" on public.story_events for select using (public.is_editor());
 
 create or replace function public.log_story_change()
@@ -185,6 +194,7 @@ create table if not exists public.push_subscriptions (
   created_at timestamptz not null default now()
 );
 alter table public.push_subscriptions enable row level security;
+drop policy if exists "push: own" on public.push_subscriptions;
 create policy "push: own" on public.push_subscriptions for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- ---------------------------------------------------------------------------
@@ -198,6 +208,7 @@ create table if not exists public.metrics_daily (
   primary key (day, event, key)
 );
 alter table public.metrics_daily enable row level security;
+drop policy if exists "metrics: editors read" on public.metrics_daily;
 create policy "metrics: editors read" on public.metrics_daily for select using (public.is_editor());
 
 create or replace function public.track(event_name text, event_key text default '')
@@ -219,6 +230,7 @@ create table if not exists public.client_errors (
   agent    text
 );
 alter table public.client_errors enable row level security;
+drop policy if exists "errors: editors read" on public.client_errors;
 create policy "errors: editors read" on public.client_errors for select using (public.is_editor());
 
 create or replace function public.log_client_error(message text, source text default null, page text default null, agent text default null)
@@ -240,6 +252,7 @@ create table if not exists public.assistant_usage (
   primary key (user_id, day)
 );
 alter table public.assistant_usage enable row level security;
+drop policy if exists "assistant: own read" on public.assistant_usage;
 create policy "assistant: own read" on public.assistant_usage for select using (auth.uid() = user_id);
 
 -- ---------------------------------------------------------------------------
