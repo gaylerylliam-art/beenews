@@ -90,11 +90,11 @@ function friendlyError(err){ return (err && err.message) ? err.message : t("errG
 
 /* ---------- chrome: account button, customise button, For You section, dialogs ---------- */
 const acctBtn = h("button",{id:"acctBtn",class:"acct",type:"button"});
-const langsw = $("langsw"); langsw.parentNode.insertBefore(acctBtn, langsw);
+const slot = $("acctSlot"); if(slot) slot.appendChild(acctBtn); else { const langsw = $("langsw"); langsw.parentNode.insertBefore(acctBtn, langsw); }
 const custBtn = h("button",{id:"custBtn",class:"custbtn",type:"button"});
 $("tabs").parentNode.insertBefore(custBtn, $("ftoggle"));
 const fy = h("section",{id:"foryou",class:"foryou","aria-labelledby":"fyTitle"});
-$("index").parentNode.insertBefore(fy, $("index"));
+$("leadwrap").parentNode.insertBefore(fy, $("leadwrap"));
 const dlg = h("dialog",{id:"bnDialog",class:"bn-dialog"});
 const toastEl = h("div",{id:"bnToast",class:"bn-toast",role:"status","aria-live":"polite",hidden:""});
 document.body.appendChild(toastEl);
@@ -224,6 +224,13 @@ function customiseView(){
   };
 }
 
+window.BN = {
+  signedIn: ()=>!!session,
+  openSignUp: ()=>openDialog(()=>authView(sb?"signup":"signin")),
+  openCustomise: ()=>openDialog(customiseView),
+  toast: (a,b)=>toast(a,b),
+  refresh: ()=>{ renderForYou(); }
+};
 acctBtn.onclick = ()=> openDialog(session ? accountView : ()=>authView("signin"));
 custBtn.onclick = ()=> openDialog(customiseView);
 
@@ -232,7 +239,7 @@ function renderForYou(){
   if(state.sec!=="All"){ fy.hidden = true; return; }
   fy.hidden = false;
   const hasPicks = prefs.sections.length || prefs.countries.length;
-  const hasAny = hasPicks || prefs.horoscope_sign || (prefs.currencies.length && prefs.currencies.join()!==DEFAULTS.currencies.join());
+  const hasAny = hasPicks || SAVED.size || prefs.horoscope_sign || (prefs.currencies.length && prefs.currencies.join()!==DEFAULTS.currencies.join());
   if(!hasAny){
     fy.innerHTML = `<div class="fy-empty"><div><h2 id="fyTitle">${esc(t("fyEmptyH"))}</h2><p>${esc(t("fyEmptyP"))}</p></div>
       <div class="fy-cta"><button class="cta-solid" type="button" data-act="cust">${esc(t("customise"))}</button>${(!session && sb)?`<button class="cta-ghost" type="button" data-act="signin">${esc(t("signIn"))}</button>`:""}</div></div>`;
@@ -245,9 +252,9 @@ function renderForYou(){
       .map(f=>`<li><b>${f.c}</b><span>1 AED = ${nf(1/f.r, 1/f.r<1?4:2)}</span></li>`).join("");
     const sg = prefs.horoscope_sign && SIGNS.find(x=>x[0]===prefs.horoscope_sign);
     fy.innerHTML = `<div class="fy-head"><h2 id="fyTitle">${esc(t("forYou"))}</h2><div class="fy-chips">${chips}</div>
-        <button class="cta-ghost sm" type="button" data-act="cust">${esc(t("fyEdit"))}</button></div>
+        ${picks.length?`<button class="cta-amber sm" type="button" data-play="fy"><i class="fa-solid fa-headphones" aria-hidden="true"></i> ${esc(t("listen"))}</button>`:""}<button class="cta-ghost sm" type="button" data-act="cust">${esc(t("fyEdit"))}</button></div>
       <div class="fy-body"><div class="fy-grid">${!hasPicks?`<p class="fy-none">${esc(t("fyPickMore"))} <button type="button" class="link-inline" data-act="cust">${esc(t("customise"))}</button></p>`:picks.length?picks.map(card).join(""):`<p class="fy-none">${esc(t("fyNone"))}</p>`}</div>
-      <aside class="fy-side">${cur?`<div class="fy-box sc-markets"><h3>${esc(t("myMarkets"))}</h3><ul>${cur}</ul></div>`:""}
+      <aside class="fy-side">${savedBox()}${cur?`<div class="fy-box sc-markets"><h3>${esc(t("myMarkets"))}</h3><ul>${cur}</ul></div>`:""}
         ${sg?`<div class="fy-box sc-horo"><h3>${esc(t("mySign"))} · ${esc(t(sg[0]))} ${sg[1]}</h3><p>${esc((HORO[lang]||HORO.en)[sg[0]]||"")}</p></div>`:""}</aside></div>`;
   }
   fy.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>openDialog(b.dataset.act==="cust"?customiseView:()=>authView("signin")));
@@ -261,8 +268,14 @@ function showForYou(){
   const y = fy.getBoundingClientRect().top + window.scrollY - $("rail").offsetHeight - 12;
   window.scrollTo({top:Math.max(0,y), behavior:(typeof REDUCE!=="undefined" && REDUCE)?"auto":"smooth"});
 }
+function savedBox(){
+  const items = S.filter(st=>SAVED.has(st.id)).slice(0,5);
+  if(!items.length) return "";
+  return `<div class="fy-box sc-all"><h3><i class="fa-solid fa-bookmark" aria-hidden="true"></i> ${esc(t("savedStories"))}</h3><ul class="fy-saved">${items.map(st=>`<li><a href="${esc(st.url)}" target="_blank" rel="noopener noreferrer">${esc(SH(st))}</a></li>`).join("")}</ul></div>`;
+}
 function refreshChrome(){
-  acctBtn.textContent = session ? (profileName || (session.user.email||"").split("@")[0] || t("account")) : t("signIn");
+  const nm = session ? (profileName || (session.user.email||"").split("@")[0] || t("account")) : t("signIn");
+  acctBtn.innerHTML = `<i class="fa-solid ${session?"fa-circle-user":"fa-right-to-bracket"}" aria-hidden="true"></i><span>${esc(nm)}</span>`;
   acctBtn.dataset.state = session ? "in" : "out";
   custBtn.textContent = t("customise");
 }
