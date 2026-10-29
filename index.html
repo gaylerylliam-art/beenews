@@ -1755,7 +1755,7 @@ const pubInitials = p => (p||"?").replace(/\(.*?\)/g,"").trim().split(/\s+/).sli
 const actBtns = st => `<button type="button" class="act listen" data-listen="${esc(st.id)}" title="${esc(t("listen"))}" aria-label="${esc(t("listen"))}">${ico("fa-volume-high")}</button>
   <button type="button" class="act save${isSaved(st.id)?" on":""}" data-save="${esc(st.id)}" aria-pressed="${isSaved(st.id)}" title="${esc(t("saveStory"))}" aria-label="${esc(t("saveStory"))}"><i class="${isSaved(st.id)?"fa-solid":"fa-regular"} fa-bookmark" aria-hidden="true"></i></button>`;
 /* Section header art (images/cards). Sections with several designs rotate by story, so neighbouring cards differ. */
-const CARDART = {"AI":["ai1","ai4","ai3","chip","ai2"],"GCC":["uae","econ1","econ2"],"Sports & Events":["sports"],"Politics":["politics"],"Cars":["cars"]};
+const CARDART = {"AI":["ai1","ai4","ai3","chip","ai2"],"GCC":["uae","econ1","econ2"],"Sports & Events":["sports"],"Politics":["politics","politics2","politics3"],"Cars":["cars"]};
 function artFor(st){
   const list = CARDART[st.sec]; if(!list || !list.length) return "";
   let h = 0; for(const c of String(st.id)) h = (h*31 + c.charCodeAt(0)) >>> 0;
