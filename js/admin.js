@@ -31,10 +31,16 @@ const fromLocalInput = v => v ? new Date(v + ":00+04:00").toISOString() : new Da
 async function gate(){
   const g = $("adGate");
   if(!sb){ g.innerHTML = `<h2>Newsroom</h2><p>Supabase isn't configured in <code>config.js</code>.</p>`; return; }
-  const {data:{session}} = await sb.auth.getSession();
+  g.hidden = false; g.innerHTML = `<p class="st-note"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Checking your sign-in…</p>`;
+  const limit = (pr, ms, what) => Promise.race([pr, new Promise((_,rej)=>setTimeout(()=>rej(new Error(what+" took too long")), ms))]);
+  let session = null, data = null, error = null;
+  try{ session = (await limit(sb.auth.getSession(), 12000, "Restoring your sign-in")).data.session; }
+  catch(e){ return gateError(e); }
   if(!session){ return signInForm(); }
-  const {data, error} = await sb.from("editors").select("user_id").eq("user_id", session.user.id).maybeSingle();
-  if(error || !data){
+  try{ ({data, error} = await limit(sb.from("editors").select("user_id").eq("user_id", session.user.id).maybeSingle(), 12000, "Checking the editors list")); }
+  catch(e){ return gateError(e); }
+  if(error && !/0 rows|no rows/i.test(error.message||"")) return gateError(error);
+  if(!data){
     g.innerHTML = `<h2>Editors only</h2><p class="st-note">You're signed in as <b>${esc(session.user.email)}</b>, but this account isn't on the editors list.</p>
       <p class="st-note">The owner can add it in Supabase → SQL editor:</p>
       <pre style="white-space:pre-wrap;background:var(--paper);padding:10px;border-radius:10px;font-size:12px">insert into public.editors (user_id)
@@ -44,12 +50,20 @@ select id from auth.users where email = '${esc(session.user.email)}';</pre>
     return;
   }
   me = session.user;
-  g.hidden = true; $("adApp").hidden = false;
+  g.hidden = true; g.style.display = "none"; $("adApp").hidden = false; $("adApp").style.display = "block";
   $("adWho").textContent = me.email;
   $("adOut").onclick = async ()=>{ await sb.auth.signOut(); location.reload(); };
   $("adTabs").onclick = e=>{ const b = e.target.closest("[data-tab]"); if(b){ tab = b.dataset.tab; show(); } };
   $("adNew").onclick = ()=>editStory(null);
   counts(); show();
+}
+function gateError(e){
+  const g = $("adGate"); g.hidden = false;
+  g.innerHTML = `<h2 style="margin-top:0">The newsroom couldn't open</h2><p class="msg err">${esc(e && e.message || e)}</p>
+    <p class="st-note">Try again in a moment. If this keeps happening, send a screenshot of this box.</p>
+    <p><button type="button" class="btn btn-amber" id="gRetry">Try again</button> <button type="button" class="btn btn-ghost" id="gOut2">Sign out</button></p>`;
+  $("gRetry").onclick = ()=>location.reload();
+  $("gOut2").onclick = async ()=>{ try{ await sb.auth.signOut(); }catch(_){ } location.reload(); };
 }
 function signInForm(){
   const g = $("adGate");
@@ -358,6 +372,7 @@ async function quickPublish(id){
   toast("Published"); counts(); show();
 }
 
+window.addEventListener("error", e=>{ if(!me) gateError(e.message); });
 BNP.render();
-gate().catch(e=>fail("Couldn't start the newsroom", e));
+gate().catch(e=>{ console.error("BeeNews admin:", e); gateError(e); });
 })();
