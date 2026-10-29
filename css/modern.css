@@ -371,3 +371,26 @@ body.has-player .totop{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
   .rail .lang button{min-width:26px;padding:7px 5px}
 }
 .foryou:has(.fy-empty){display:none}
+
+/* ---------- full logo in the header ---------- */
+.brand{position:relative}
+.logo-full{display:block;height:120px;width:auto;max-width:none;border-radius:18px;background:#fff;padding:4px 10px;box-sizing:content-box;image-rendering:auto}
+:root[data-theme="dark"] .logo-full{box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+.logo-full.lg-ar,.ft-logo .lg-ar{display:none}
+:root[lang="ar"] .logo-full.lg-en,:root[lang="ar"] .ft-logo .lg-en{display:none}
+:root[lang="ar"] .logo-full.lg-ar,:root[lang="ar"] .ft-logo .lg-ar{display:block}
+.brand-compact{display:none;align-items:center;gap:12px}
+.brandrow{min-height:136px;transition:min-height .25s}
+/* once scrolled, the header shrinks to the bee icon and wordmark */
+.rail.compact .brandrow{min-height:64px}
+.rail.compact .logo-full{display:none !important}
+.rail.compact .brand-compact{display:flex}
+.ft-logo{display:inline-block;background:#fff;border-radius:14px;padding:4px 8px;align-self:flex-start}
+.ft-logo img{display:block;height:90px;width:auto}
+@media (max-width:760px){
+  .logo-full{height:100px;padding:3px 8px;border-radius:14px}
+  .brandrow{min-height:0}
+  .rail.compact .brandrow{display:none}
+  .brand-compact{display:none !important}
+}
+.teaser li span{font-family:var(--f-ui)}

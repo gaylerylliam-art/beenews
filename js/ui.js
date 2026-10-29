@@ -235,7 +235,7 @@ setLang = function(l){ baseSetLang(l); setLabels(); renderPray(); renderWx(); if
 let lastY = scrollY;
 addEventListener("scroll", ()=>{
   const y = scrollY, small = innerWidth <= 760;
-  $("rail").classList.toggle("compact", small && y > 160 && y > lastY - 4);
+  $("rail").classList.toggle("compact", small ? (y > 160 && y > lastY - 4) : y > 140);
   lastY = y;
 }, {passive:true});
 

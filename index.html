@@ -613,8 +613,10 @@ footer{border-top:0}
   <div class="wrap">
     <div class="brandrow">
       <a class="brand" id="logo" href="#" aria-label="BeeNews home">
-        <span class="brand-icon"><img src="icons/icon-192.png" alt="" width="48" height="48"></span>
-        <span class="brand-text"><span class="wordmark"><b>Bee</b><em>News</em></span><span class="slogan" id="tagline" data-i="slogan"></span></span>
+        <img class="logo-full lg-en" src="images/logo-en-120.webp" srcset="images/logo-en-120.webp 1x, images/logo-en-240.webp 2x, images/logo-en-360.webp 3x" width="168" height="120" alt="BeeNews — Bee The First To Know">
+        <img class="logo-full lg-ar" src="images/logo-ar-120.webp" srcset="images/logo-ar-120.webp 1x, images/logo-ar-240.webp 2x, images/logo-ar-360.webp 3x" width="143" height="120" alt="بي نيوز — كن أول من يعرف">
+        <span class="brand-compact"><span class="brand-icon"><img src="icons/icon-192.png" alt="" width="44" height="44"></span>
+        <span class="brand-text"><span class="wordmark"><b>Bee</b><em>News</em></span><span class="slogan" id="tagline" data-i="slogan"></span></span></span>
       </a>
       <div class="widgets"><button class="wx" id="wxBtn" type="button" aria-expanded="false" aria-controls="wxPanel"><span class="wx-i" id="wxIcon"><i class="fa-solid fa-sun" aria-hidden="true"></i></span><span class="wx-t"><b id="wxMain"></b><small id="wxSub"></small></span></button>
         <button class="mkmini" id="mkMini" type="button" aria-label="Markets"></button>
@@ -792,7 +794,7 @@ footer{border-top:0}
 
 <footer class="sitefoot"><div class="wrap">
   <div class="ft-grid">
-    <div class="ft-brand"><span class="brand-icon sm"><img src="icons/icon-192.png" alt="" width="32" height="32"></span><b class="wordmark"><b>Bee</b><em>News</em></b>
+    <div class="ft-brand"><span class="ft-logo"><img class="lg-en" src="images/logo-en-120.webp" srcset="images/logo-en-120.webp 1x, images/logo-en-240.webp 2x, images/logo-en-360.webp 3x" width="126" height="90" alt="BeeNews"><img class="lg-ar" src="images/logo-ar-120.webp" srcset="images/logo-ar-120.webp 1x, images/logo-ar-240.webp 2x, images/logo-ar-360.webp 3x" width="107" height="90" alt="بي نيوز"></span>
       <p data-i="ftBlurb"></p></div>
     <div><h4 data-i="ftSections"></h4><ul id="ftSecs"></ul></div>
     <div><h4>BeeNews</h4><ul>
@@ -2077,8 +2079,7 @@ function setupBands(){
 }
 function introNameplate(){
   if(!MOTION) return;
-  gsap.fromTo("#logo .brand-icon",{scale:.6,opacity:0,rotate:-12},{scale:1,opacity:1,rotate:0,duration:.8,ease:"back.out(1.8)"});
-  gsap.fromTo("#logo .brand-text",{opacity:0,x:-10},{opacity:1,x:0,duration:.6,delay:.15,ease:"power2.out"});
+  gsap.fromTo("#logo .logo-full",{scale:.85,opacity:0,y:-8},{scale:1,opacity:1,y:0,duration:.8,ease:"back.out(1.6)"});
   gsap.fromTo(".hero",{opacity:0,y:18},{opacity:1,y:0,duration:.7,delay:.1,ease:"power3.out"});
   gsap.fromTo(".side > *",{opacity:0,y:18},{opacity:1,y:0,duration:.6,stagger:.1,delay:.25,ease:"power3.out"});
 }
